@@ -40,8 +40,8 @@ MonoBehaviour:
   gameThreadPriority: 0
   renderThreadPriority: -2
   jobWorkerThreadPriority: 0
-  debugLogFlagForNative: 1048335
-  debugLogFlagForUnity: 112
+  debugLogFlagForNative: 0
+  debugLogFlagForUnity: 16
   overrideLogFlagForNative: 0
   useCMPChecker: 0
   amcMode: 0
