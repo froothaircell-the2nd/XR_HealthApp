@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Samples/VIVE Wave XR Plugin/6.2.0-r.9/XR/Hand/NaturalHandXR.unity
-    guid: ffb3aaea220f14647b4360d8c31d09da
+    path: Assets/Scenes/Workbench_Scene.unity
+    guid: 9fc0d4010bbf28b4594072e72b8655ab
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 24bf867b2b0b35143b5d3061934112c2, type: 2}
     com.htc.upm.wave.xrsdk.xrsettings: {fileID: 11400000, guid: f053c7cdbbacdbe449afd966a0d75f89, type: 2}

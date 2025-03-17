@@ -165,6 +165,8 @@ namespace CoreResources.Singleton
                 return _instance;
             }
         }
+
+        public static bool IsInstantiated => _instance != null;
         #endregion
 
         #region Overrides
@@ -231,6 +233,8 @@ namespace CoreResources.Singleton
                 return _instance;
             }
         }
+
+        public static bool IsInstantiated => _instance != null;
         #endregion
 
         #region Overrides

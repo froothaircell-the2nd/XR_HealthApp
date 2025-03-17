@@ -196,7 +196,7 @@ namespace Wave.Essence.InputModule
 			if (pointerMaterialInstance != null)
 			{
 				pointerMaterialInstance.renderQueue = m_PointerRenderQueue;
-				pointerMaterialInstance.SetColor("_Color", colorFactor);
+				pointerMaterialInstance.SetFloat("_Color", 1f);
 				pointerMaterialInstance.SetFloat("_useTexture", m_UseTexture ? 1.0f : 0.0f);
 				pointerMaterialInstance.SetFloat("_OuterDiameter", pointerOuterDiameter);
 				pointerMaterialInstance.SetFloat("_DistanceInMeters", m_PointerDistanceInMeters);

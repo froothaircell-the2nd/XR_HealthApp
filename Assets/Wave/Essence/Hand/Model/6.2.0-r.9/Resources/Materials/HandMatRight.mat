@@ -2,20 +2,24 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: HandMatRight
   m_Shader: {fileID: 4800000, guid: e7d763db3f0479b49a6e358298f1717f, type: 3}
-  m_ShaderKeywords: 
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -31,17 +35,19 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - _Gradient_Blur: 0.2854134
     - _Gradient_level: 0.5225084
     - _Opacity: 0.45
-    - _OutlineThickness: 0.001
+    - _OutlineThickness: 0.0013
     - __dirty: 1
-    - _line_opacity: 0.5
+    - _line_opacity: 0.403
     m_Colors:
     - _ConColorA: {r: 0.1058824, g: 0.6901961, b: 0.9019608, a: 0}
     - _ConColorB: {r: 1, g: 1, b: 1, a: 0}
-    - _ConGraColorA: {r: 1, g: 1, b: 1, a: 0}
-    - _ConGraColorB: {r: 1, g: 1, b: 1, a: 0}
-    - _GraColorA: {r: 1, g: 1, b: 1, a: 0}
-    - _GraColorB: {r: 1, g: 1, b: 1, a: 0}
+    - _ConGraColorA: {r: 0.037666522, g: 0, b: 0.4150942, a: 1}
+    - _ConGraColorB: {r: 4, g: 4, b: 4, a: 1}
+    - _GraColorA: {r: 0, g: 0.003837578, b: 0.3018862, a: 0}
+    - _GraColorB: {r: 1.2924526, g: 0, b: 0.19929628, a: 1}
+  m_BuildTextureStacks: []
