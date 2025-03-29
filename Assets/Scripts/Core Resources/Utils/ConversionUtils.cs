@@ -53,6 +53,18 @@ namespace CoreResources.Utils
             return Mathf.Log10(val) * 20;
         }
 
+        public static double ToRadians(this double val)
+        {
+            // Angle in 10th of a degree
+            return (val * Math.PI) / 180;
+        }
+
+        public static float ToRadians(this float val)
+        {
+            // Angle in 10th of a degree
+            return (val * (float) Math.PI) / 180;
+        }
+
         #region Byte String Conversions
         public static string ConvertByteToString(byte[] _bytes)
         {

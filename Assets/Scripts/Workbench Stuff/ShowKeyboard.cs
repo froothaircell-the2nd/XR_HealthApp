@@ -12,18 +12,18 @@ public class ShowKeyboard : MonoBehaviour
     [SerializeField]
     private TMP_InputField _inputField;
 
-    private void OnEnable()
+    private void Awake()
     {
         if (_inputField != null)
         {
             // To ensure that the keyboard is turned on on select
             // and not the internal soft keyboard click activation
             _inputField.keyboardType = (TouchScreenKeyboardType)(-1); 
-            _inputField.onSelect.AddListener(DisplayKeyboard);
+            // _inputField.onSelect.AddListener(DisplayKeyboard);
         }
     }
 
-    private void OnDisable()
+    private void OnDestroy()
     {
         if (_inputField != null)
         {
@@ -49,10 +49,9 @@ public class ShowKeyboard : MonoBehaviour
 
     private void OnInputComplete(string text)
     {
-        _inputField.text = text;
-
         if (_inputField != null)
         {
+            _inputField.text = text;
             InputManager.Instance.EventSystem.SetSelectedGameObject(null);
         }
     }
