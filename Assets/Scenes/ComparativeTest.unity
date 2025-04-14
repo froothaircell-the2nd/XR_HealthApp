@@ -528,6 +528,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _pooledPrefab: {fileID: 5972781266908888448, guid: 61129f7d635f94a4da7ed3b2df5c4b45, type: 3}
+  _initializedCount: 45
 --- !u!4 &128327833
 Transform:
   m_ObjectHideFlags: 0
@@ -2821,6 +2822,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _pooledPrefab: {fileID: 1068335532561328356, guid: 93a24878b2616aa428d85729ed71e552, type: 3}
+  _initializedCount: 45
 --- !u!1 &1775703386
 GameObject:
   m_ObjectHideFlags: 0
