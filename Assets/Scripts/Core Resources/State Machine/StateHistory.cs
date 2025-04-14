@@ -53,9 +53,9 @@ namespace CoreResources.StateMachine
         }
     }
 
-    public class StateHistorySimplified<TStateMachine, TState> : StateHistory
+    public class StateHistory<TStateMachine, TState> : StateHistory
         where TStateMachine : StateMachineHistory<TStateMachine, TState>, new()
-        where TState : StateHistorySimplified<TStateMachine, TState>
+        where TState : StateHistory<TStateMachine, TState>
     {
         public TState PrevState { get; set; }
         public TState NextState { get; set; }

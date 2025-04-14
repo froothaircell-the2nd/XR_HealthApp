@@ -19,14 +19,12 @@ namespace CoreResources.Utils
         #endregion
 
         #region Overrides
-        public override void InitSingleton()
+        public override void OnInit()
         {
-            base.InitSingleton();
-
             _serviceList = new Dictionary<Type, IGenericSingleton>();
         }
 
-        public override void CleanSingleton()
+        public override void OnDeInit()
         {
             var keys = _serviceList.Keys.ToList();
             for (int i = 0; i < _serviceList.Count; i++)
@@ -36,8 +34,6 @@ namespace CoreResources.Utils
 
             _serviceList.Clear();
             _serviceList = null;
-
-            base.CleanSingleton();
         }
         #endregion
 

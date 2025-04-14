@@ -7,11 +7,13 @@ namespace CoreResources.UI
     public enum UIViewType
     {
         None, // Don't try loading this unless you want to hate yourself ._.
-        MainMenu,
-        Loading,
-        Settings,
-        HUDMenu,
-        Chat,
+        //MainMenu, // Commented for the time being, remove once testing is complete
+        //Loading,
+        //Settings,
+        //HUDMenu,
+        //Chat,
+        App1,
+        App2,
     }
 
 
@@ -84,6 +86,9 @@ namespace CoreResources.UI
 
         protected abstract void InitializeManager();
         protected abstract void DeInitializeManager();
+        protected abstract void OnInitialize();
+        protected abstract void OnDeInitialize();
+
         public abstract void ShowPanel();
         public abstract void HidePanel();
         public abstract void OnShowPanel();
@@ -94,6 +99,17 @@ namespace CoreResources.UI
             _canvasGroup.interactable = enableInteraction;
             _canvasGroup.blocksRaycasts = enableInteraction;
             _canvasGroup.ignoreParentGroups = ignoreParentGroups;
+        }
+
+
+        public virtual void ManualInitManager()
+        {
+            InitializeManager();
+        }
+
+        public virtual void ManualDeInitManager()
+        {
+            DeInitializeManager();
         }
     }
 
@@ -138,6 +154,8 @@ namespace CoreResources.UI
                 HidePanel();
 
                 _isInitialized = true;
+
+                OnInitialize();
             }
         }
 
@@ -148,6 +166,8 @@ namespace CoreResources.UI
                 view.DeInitializeViewElements();
                 StopAllCoroutines();
                 _isInitialized = false;
+
+                OnDeInitialize();
             }
         }
 

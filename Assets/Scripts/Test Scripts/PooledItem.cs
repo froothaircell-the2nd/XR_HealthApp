@@ -2,34 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PooledItem : MonoBehaviour
+public interface IPooledItem
 {
-    [SerializeField]
-    private float _targetVelocity = 10f;
-    [SerializeField, Range(0f, 1f)]
-    private float _velocityBlendStrength = 0.5f;
-    [SerializeField]
-    private Rigidbody _rb;
-    [SerializeField]
-    private LayerMask _validCollisionLayers;
+    public bool IsPooled { get; }
 
+    public void InitializePooledItem(GameObjectPool parentPool);
+    public void SpawnItem(Vector3 position, Quaternion rotation);
+    public void ReturnToPool();
+}
+
+public class PooledItem : MonoBehaviour, IPooledItem
+{
     private GameObjectPool _parentPool;
 
-    private bool _isPooled = false;
-    private bool _isInitialized = false;
+    protected bool _isPooled = false;
+    protected bool _isInitialized = false;
 
     public bool IsPooled => _isInitialized && _isPooled;
-
-    private void Update()
-    {
-        if (_isInitialized && !_isPooled)
-        {
-            var targetVelocity = transform.forward * _targetVelocity;
-            var currentVelocity = _rb.velocity;
-
-            _rb.AddForce((targetVelocity - currentVelocity) * _velocityBlendStrength);
-        }
-    }
 
     public void InitializePooledItem(GameObjectPool parentPool)
     {
@@ -48,6 +37,8 @@ public class PooledItem : MonoBehaviour
             transform.rotation = rotation;
             gameObject.SetActive(true);
             _isPooled = false;
+
+            OnSpawn();
         }
     }
 
@@ -55,17 +46,21 @@ public class PooledItem : MonoBehaviour
     {
         if (_isInitialized && !_isPooled)
         {
+            OnDespawn();
+
             gameObject.SetActive(false);
             _parentPool.ReturnItemToPool(this);
             _isPooled = true;
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    protected virtual void OnSpawn()
     {
-        if (other != null && (_validCollisionLayers.value & (1 << other.gameObject.layer)) > 0)
-        {
-            ReturnToPool();
-        }
+
+    }
+
+    protected virtual void OnDespawn()
+    {
+
     }
 }

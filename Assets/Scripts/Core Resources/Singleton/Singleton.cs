@@ -10,6 +10,8 @@ namespace CoreResources.Singleton
     {
         void InitSingleton();
         void CleanSingleton();
+        void OnInit();
+        void OnDeInit();
     }
 
     public interface IGenericSingleton<T> : IGenericSingleton
@@ -30,6 +32,14 @@ namespace CoreResources.Singleton
         {
             throw new NotImplementedException();
         }
+
+        public void OnInit()
+        {
+        }
+
+        public void OnDeInit()
+        {
+        }
     }
 
     public abstract class MonoSingleton : MonoBehaviour, IGenericSingleton
@@ -45,6 +55,14 @@ namespace CoreResources.Singleton
         {
             throw new NotImplementedException();
         }
+
+        public void OnInit()
+        {
+        }
+
+        public void OnDeInit()
+        {
+        }
     }
     
     public abstract class DestroyableMonoSingleton : MonoBehaviour, IGenericSingleton
@@ -59,6 +77,14 @@ namespace CoreResources.Singleton
         public virtual void CleanSingleton()
         {
             throw new NotImplementedException();
+        }
+
+        public virtual void OnInit()
+        {
+        }
+
+        public virtual void OnDeInit()
+        {
         }
     }
     #endregion
@@ -221,7 +247,8 @@ namespace CoreResources.Singleton
             {
                 if (_instance == null)
                 {
-                    throw new UnassignedReferenceException($"Accessing {typeof(T).Name} before it has been set.");
+                    Debug.LogWarning($"Accessing {typeof(T).Name} before it has been set.");
+                    return null;
                     // Can do this but it's too expensive
                     // _instance = FindObjectOfType<T>();
                     //if (_instance == null)
@@ -234,12 +261,16 @@ namespace CoreResources.Singleton
             }
         }
 
+        protected static bool _initializationComplete = false;
         public static bool IsInstantiated => _instance != null;
         #endregion
 
         #region Overrides
         public override void InitSingleton()
         {
+            if (_initializationComplete)
+                return;
+
             if (Instance != null && GetInstanceID() != Instance.GetInstanceID())
             {
                 Destroy(gameObject);
@@ -247,16 +278,26 @@ namespace CoreResources.Singleton
             else
             {
                 _instance = this as T;
+                OnInit();
+
+                _initializationComplete = true;
             }
+
         }
 
         public override void CleanSingleton()
         {
+            if (!_initializationComplete)
+                return;
+
             if (_disposables != null)
             {
                 _disposables.ClearDisposables();
                 _disposables = null;
             }
+
+            OnDeInit();
+            _initializationComplete = false;
         }
 
         protected void Awake()

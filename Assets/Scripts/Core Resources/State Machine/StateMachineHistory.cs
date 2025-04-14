@@ -22,7 +22,7 @@ namespace CoreResources.StateMachine
 
     public class StateMachine
     {
-        private IState CurrentState { get; set; }
+        public IState CurrentState { get; protected set; }
 
         public Action<StateMachine, IState, IState> OnStateChanged;
 
@@ -85,7 +85,7 @@ namespace CoreResources.StateMachine
 
     public class StateMachineHistory<TStateMachine, TState> : StateMachineHistory
         where TStateMachine : StateMachineHistory<TStateMachine, TState>, new()
-        where TState : StateHistorySimplified<TStateMachine, TState>
+        where TState : StateHistory<TStateMachine, TState>
     {
         private int _totalNextStates;
         private int _totalPreviousStates;
@@ -96,6 +96,19 @@ namespace CoreResources.StateMachine
             get
             {
                 return _currentState;
+            }
+
+            set
+            {
+                CurrentState = value;
+            }
+        }
+
+        public Type CurrentStateType
+        {
+            get
+            {
+                return _currentState.GetType();
             }
         }
 
@@ -161,8 +174,8 @@ namespace CoreResources.StateMachine
 
         public virtual void GoToStateNonHistorically<TStateType>()
         {
-            // Clean all states and insert a new state. Requires a context
-            _currentState.CleanAllStates();
+            // Clean all states and insert a new state.
+            _currentState?.CleanAllStates();
             _totalNextStates = 0;
             _totalPreviousStates = 0;
             InternalStateTransition(GetState(typeof(TStateType)));

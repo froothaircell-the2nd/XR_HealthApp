@@ -66,10 +66,8 @@ namespace CoreResources.Managers
         private const string AMBIENCE_VOLUME_STR = "AmbienceVolume";
 
         #region Overrides
-        public override void InitSingleton()
+        public override void OnInit()
         {
-            base.InitSingleton();
-
             _audioInitialized = false;
             _currentlyPlayingBgm = BackgroundSounds.None;
             _currentlyPlayingBGMSource = null;
@@ -89,12 +87,10 @@ namespace CoreResources.Managers
             };
         }
 
-        public override void CleanSingleton()
+        public override void OnDeInit()
         {
             StopBG();
             StopAllOneShots();
-
-            base.CleanSingleton();
         }
 
         private void Start()

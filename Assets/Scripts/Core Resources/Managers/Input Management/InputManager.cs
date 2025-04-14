@@ -53,7 +53,7 @@ namespace CoreResources.Managers.InputManagement
 
 
     [RequireComponent(typeof(PlayerInput))] // PlayerInput is important for manual control switching
-    public class InputManager : MonoSingleton<InputManager>
+    public class InputManager : DestroyableMonoSingleton<InputManager>
     {
         #region Private Properties
         private PlayerInput _playerInput;
@@ -110,10 +110,8 @@ namespace CoreResources.Managers.InputManagement
         #endregion
 
         #region Overrides
-        public override void InitSingleton()
+        public override void OnInit()
         {
-            base.InitSingleton();
-
             InputActions = new BaseInputActions();
             
             _playerInput = GetComponent<PlayerInput>();
@@ -146,7 +144,7 @@ namespace CoreResources.Managers.InputManagement
             CheckForInputs();
         }
 
-        public override void CleanSingleton()
+        public override void OnDeInit()
         {
             InputSystem.onDeviceChange -= OnInputChanged;
             _playerInput.onControlsChanged -= OnControlSchemeSwitched;
