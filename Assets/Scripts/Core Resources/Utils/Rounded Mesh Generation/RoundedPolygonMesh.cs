@@ -11,92 +11,165 @@ namespace CoreResources.Utils
         [SerializeField] private float _cornerRadius = 0.1f;
         [SerializeField] private int _cornerResolution = 4;
         [SerializeField] private Transform _spawnPos;
+        [SerializeField] private float _borderThickness = 0.1f;
 
-        private Mesh mesh;
+        [Header("Materials")]
+        [SerializeField] private Material _fillMaterial;
+        [SerializeField] private Material _borderMaterial;
 
-        //private void Start()
-        //{
-        //    StartCoroutine(Test_RandomSpawnPoints());
-        //}
+        [Header("Meshes")]
+        [SerializeField] private MeshFilter _fillMeshFilter;
+        [SerializeField] private MeshRenderer _fillMeshRenderer;
+        [SerializeField] private MeshFilter _borderMeshFilter;
+        [SerializeField] private MeshRenderer _borderMeshRenderer;
 
-        //private void Update()
-        //{
-        //    GenerateMesh();
-        //}
+        private Mesh _fillMesh;
+        private Mesh _borderMesh;
 
-        public void GenerateMesh()
+        private void Start()
+        {
+            StartCoroutine(Test_RandomSpawnPoints());
+        }
+
+        private void Update()
+        {
+            GenerateMeshes();
+        }
+
+        public void GenerateMeshes()
         {
             if (_points.Count < 3)
             {
                 Debug.LogError("Need at least 3 points.");
                 return;
             }
+            
+            _fillMesh = new Mesh();
+            _borderMesh = new Mesh();
 
-            mesh = new Mesh();
-            List<Vector3> vertices = new List<Vector3>();
-            List<int> triangles = new List<int>();
+            List<Vector3> innerArc = GenerateArcPoints(_points, _cornerRadius, _cornerResolution);
 
-            Vector3 center = Vector3.zero;
-            vertices.Add(center); // index 0
+            // Generate inner fan mesh
+            _fillMesh = CreateFanMesh(Vector3.zero, innerArc);
+            _fillMeshFilter.mesh = _fillMesh;
+            _fillMeshRenderer.material = _fillMaterial;
 
-            // Generate rounded arc points
+            // Generate outer ring mesh
+            _borderMesh = CreateRingMesh(innerArc, _borderThickness);
+            _borderMeshFilter.mesh = _borderMesh;
+            _borderMeshRenderer.material = _borderMaterial;
+        }
+
+        List<Vector3> GenerateArcPoints(List<Transform> points, float radius, int resolution)
+        {
             List<Vector3> arcPoints = new List<Vector3>();
-            for (int i = 0; i < _points.Count; i++)
+
+            for (int i = 0; i < points.Count; i++)
             {
-                Vector3 prev = _points[(i - 1 + _points.Count) % _points.Count].localPosition;
-                Vector3 current = _points[i].localPosition;
-                Vector3 next = _points[(i + 1) % _points.Count].localPosition;
+                Vector3 prev = points[(i - 1 + points.Count) % points.Count].localPosition;
+                Vector3 current = points[i].localPosition;
+                Vector3 next = points[(i + 1) % points.Count].localPosition;
 
                 Vector3 dirA = (prev - current).normalized;
                 Vector3 dirB = (next - current).normalized;
 
-                Vector3 start = current + dirA * _cornerRadius;
-                Vector3 end = current + dirB * _cornerRadius;
+                Vector3 start = current + dirA * radius;
+                Vector3 end = current + dirB * radius;
 
-                // Create arc using Bezier between start-current-end
-                for (int j = 0; j < _cornerResolution; j++)
+                for (int j = 0; j < resolution; j++)
                 {
-                    float t = j / (float)(_cornerResolution - 1);
+                    float t = j / (float)(resolution - 1);
                     Vector3 arcPoint = Bezier(start, current, end, t);
                     arcPoints.Add(arcPoint);
                 }
             }
 
-            // Add arc points to mesh vertices
+            return arcPoints;
+        }
+
+        private Mesh CreateFanMesh(Vector3 center, List<Vector3> arcPoints)
+        {
+            Mesh mesh = new Mesh();
+
+            List<Vector3> vertices = new List<Vector3> { center };
             vertices.AddRange(arcPoints);
 
-            int arcPointCount = arcPoints.Count;
-
-            // Add triangles from center to each arc segment
-            for (int i = 0; i < arcPointCount; i++)
+            List<int> triangles = new List<int>();
+            int count = arcPoints.Count;
+            for (int i = 0; i < count; i++)
             {
-                int a = 0; // center
-                int b = 1 + i;
-                int c = 1 + ((i + 1) % arcPointCount);
-                triangles.Add(a);
-                triangles.Add(b);
-                triangles.Add(c);
+                triangles.Add(0);
+                triangles.Add(1 + i);
+                triangles.Add(1 + (i + 1) % count);
             }
 
-            mesh.Clear();
             mesh.SetVertices(vertices);
             mesh.SetTriangles(triangles, 0);
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();
 
-            GetComponent<MeshFilter>().mesh = mesh;
+            return mesh;
+        }
+
+        private Mesh CreateRingMesh(List<Vector3> innerArc, float thickness)
+        {
+            Mesh mesh = new Mesh();
+
+            List<Vector3> outerArc = new List<Vector3>();
+            foreach (var pt in innerArc)
+            {
+                Vector3 dir = (pt - Vector3.zero).normalized;
+                outerArc.Add(pt + dir * thickness);
+            }
+
+            List<Vector3> vertices = new List<Vector3>();
+            List<int> triangles = new List<int>();
+
+            int count = innerArc.Count;
+
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 innerA = innerArc[i];
+                Vector3 innerB = innerArc[(i + 1) % count];
+                Vector3 outerA = outerArc[i];
+                Vector3 outerB = outerArc[(i + 1) % count];
+
+                int index = vertices.Count;
+
+                vertices.Add(innerA); // 0
+                vertices.Add(innerB); // 1
+                vertices.Add(outerA); // 2
+                vertices.Add(outerB); // 3
+
+                // Tri 1
+                triangles.Add(index + 0);
+                triangles.Add(index + 2);
+                triangles.Add(index + 3);
+
+                // Tri 2
+                triangles.Add(index + 0);
+                triangles.Add(index + 3);
+                triangles.Add(index + 1);
+            }
+
+            mesh.SetVertices(vertices);
+            mesh.SetTriangles(triangles, 0);
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+
+            return mesh;
         }
 
         public Vector3 GetRandomPointOnMesh()
         {
-            if (mesh == null)
+            if (_fillMesh == null)
             {
                 Debug.LogError("Mesh not assigned.");
                 return Vector3.zero;
             }
 
-            Vector3[] vertices = mesh.vertices;
-            int[] triangles = mesh.triangles;
+            Vector3[] vertices = _fillMesh.vertices;
+            int[] triangles = _fillMesh.triangles;
 
             // Pick a random triangle
             int triIndex = Random.Range(0, triangles.Length / 3) * 3;
