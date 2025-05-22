@@ -14,7 +14,7 @@ public class CTStateMachineMediator : MonoSingleton<CTStateMachineMediator>
     [SerializeField]
     private InputManager _inputManager;
     [SerializeField]
-    private GameObjectPool _objPool1, _objPool2;
+    private CT_GameObjectPool _objPool1, _objPool2;
     [SerializeField]
     private CTUIManager _UIManager;
     [SerializeField]

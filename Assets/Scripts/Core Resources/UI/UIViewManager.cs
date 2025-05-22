@@ -7,13 +7,14 @@ namespace CoreResources.UI
     public enum UIViewType
     {
         None, // Don't try loading this unless you want to hate yourself ._.
-        //MainMenu, // Commented for the time being, remove once testing is complete
+        MainMenu, // Commented for the time being, remove once testing is complete
         //Loading,
         //Settings,
         //HUDMenu,
         //Chat,
-        App1,
-        App2,
+        AppP1,
+        AppP2,
+        AppP3,
     }
 
 

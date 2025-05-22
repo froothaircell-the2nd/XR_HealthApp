@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PooledTarget : PooledItem
+public class PooledTarget : CT_PooledItem
 {
     [SerializeField]
     private float _minTargetLifetime = 0.01f, _maxTargetLifetime = 5f;

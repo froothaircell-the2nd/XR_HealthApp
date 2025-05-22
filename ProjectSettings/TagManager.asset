@@ -14,8 +14,8 @@ TagManager:
   - ProjectileBounds
   - Target_Projectile
   - User
-  - 
-  - 
+  - Spawn_Interactable
+  - Spawn_InteractionPlane
   - 
   - 
   - 

@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/ComparativeTest.unity
-    guid: 71d7fbec953967e4e87b0699a60a1d69
+    path: Assets/Scenes/EntryScene.unity
+    guid: 379a4b8aba563f14eb0dc11c4f4db48d
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 24bf867b2b0b35143b5d3061934112c2, type: 2}
     com.htc.upm.wave.xrsdk.xrsettings: {fileID: 11400000, guid: f053c7cdbbacdbe449afd966a0d75f89, type: 2}

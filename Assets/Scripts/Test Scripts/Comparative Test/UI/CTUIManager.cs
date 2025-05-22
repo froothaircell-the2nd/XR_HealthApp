@@ -61,17 +61,17 @@ public class CTUIManager : DestroyableMonoSingleton<CTUIManager>
 
         if (isApp1)
         {
-            currView = _viewManagers.First((elem) => elem.AssignedViewType == UIViewType.App1);
-            otherView = _viewManagers.First((elem) => elem.AssignedViewType == UIViewType.App2);
+            // currView = _viewManagers.First((elem) => elem.AssignedViewType == UIViewType.App1);
+            // otherView = _viewManagers.First((elem) => elem.AssignedViewType == UIViewType.App2);
         }
         else
         {
-            currView = _viewManagers.First((elem) => elem.AssignedViewType == UIViewType.App2);
-            otherView = _viewManagers.First((elem) => elem.AssignedViewType == UIViewType.App1);
+            // currView = _viewManagers.First((elem) => elem.AssignedViewType == UIViewType.App2);
+            // otherView = _viewManagers.First((elem) => elem.AssignedViewType == UIViewType.App1);
         }
 
-        currView.SetMenuInteractability(true);
-        otherView.SetMenuInteractability(false);
+        // currView.SetMenuInteractability(true);
+        // otherView.SetMenuInteractability(false);
     }
     #endregion
 }

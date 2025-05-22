@@ -10,7 +10,7 @@ public class CTGameManager : DestroyableMonoSingleton<CTGameManager>
 {
     #region Serialized Fields
     [SerializeField]
-    private GameObjectPool _pool1, _pool2;
+    private CT_GameObjectPool _pool1, _pool2;
 
     [Space(5)]
 
@@ -236,7 +236,7 @@ public class CTGameManager : DestroyableMonoSingleton<CTGameManager>
 
         if (Physics.Raycast(pos, rot, out var hit, _maxRaycastDistance, _collisionLayerMask.value))
         {
-            hit.collider.GetComponent<PooledItem>().ReturnToPool();
+            hit.collider.GetComponent<CT_PooledItem>().ReturnToPool();
         }
     }
     #endregion

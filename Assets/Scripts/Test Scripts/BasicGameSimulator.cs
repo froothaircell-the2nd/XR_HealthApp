@@ -16,7 +16,7 @@ public class BasicGameSimulator : MonoBehaviour
     private Button _exitButton;
 
     [SerializeField]
-    private GameObjectPool _pool;
+    private CT_GameObjectPool _pool;
     [SerializeField]
     private GameObject _gameSet;
     [SerializeField] 
@@ -147,7 +147,7 @@ public class BasicGameSimulator : MonoBehaviour
 
         if (Physics.Raycast(pos, rot, out var hit, _maxRaycastDistance, _collisionLayerMask.value))
         {
-            hit.collider.GetComponent<PooledItem>().ReturnToPool();
+            hit.collider.GetComponent<CT_PooledItem>().ReturnToPool();
         }
     }
 }

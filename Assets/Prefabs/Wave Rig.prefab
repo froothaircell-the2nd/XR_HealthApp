@@ -127,7 +127,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_GazeRaycast:
-    Enabled: 1
+    Enabled: 0
   m_ControllerRaycast:
     Enabled: 1
   m_HandRaycast:
@@ -904,6 +904,7 @@ GameObject:
   - component: {fileID: 4356240865423160608}
   - component: {fileID: 6065961754883238608}
   - component: {fileID: 4953300189408930550}
+  - component: {fileID: 940045498141416428}
   m_Layer: 8
   m_Name: Right Controller
   m_TagString: Untagged
@@ -1618,7 +1619,7 @@ MonoBehaviour:
   m_PhysicsCastDistance: 100
   m_PhysicsEventMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 503
   s_GraphicTags: []
   m_ShowRay: 1
   m_RayStartWidth: 0.01
@@ -1633,6 +1634,50 @@ MonoBehaviour:
     StateEx: 
   m_HideWhenIdle: 1
   m_AlwaysEnable: 0
+--- !u!114 &940045498141416428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3647145101558616645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
 --- !u!1 &4001131420870971864
 GameObject:
   m_ObjectHideFlags: 0
@@ -2052,7 +2097,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
@@ -2942,6 +2987,7 @@ GameObject:
   - component: {fileID: 4403412692113925067}
   - component: {fileID: 2874907835856706947}
   - component: {fileID: 518191886067479682}
+  - component: {fileID: 1067621992390982349}
   m_Layer: 8
   m_Name: Left Controller
   m_TagString: Untagged
@@ -3656,7 +3702,7 @@ MonoBehaviour:
   m_PhysicsCastDistance: 100
   m_PhysicsEventMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 503
   s_GraphicTags: []
   m_ShowRay: 1
   m_RayStartWidth: 0.01
@@ -3671,6 +3717,50 @@ MonoBehaviour:
     StateEx: 
   m_HideWhenIdle: 1
   m_AlwaysEnable: 0
+--- !u!114 &1067621992390982349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8270165420824601488}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79441f348de89743a2939f4d699eac1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RenderShadows: 1
+  m_RequiresDepthTextureOption: 2
+  m_RequiresOpaqueTextureOption: 2
+  m_CameraType: 0
+  m_Cameras: []
+  m_RendererIndex: -1
+  m_VolumeLayerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  m_VolumeTrigger: {fileID: 0}
+  m_VolumeFrameworkUpdateModeOption: 2
+  m_RenderPostProcessing: 0
+  m_Antialiasing: 0
+  m_AntialiasingQuality: 2
+  m_StopNaN: 0
+  m_Dithering: 0
+  m_ClearDepth: 1
+  m_AllowXRRendering: 1
+  m_AllowHDROutput: 1
+  m_UseScreenCoordOverride: 0
+  m_ScreenSizeOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_ScreenCoordScaleBias: {x: 0, y: 0, z: 0, w: 0}
+  m_RequiresDepthTexture: 0
+  m_RequiresColorTexture: 0
+  m_Version: 2
+  m_TaaSettings:
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
 --- !u!1 &8789751542895505009
 GameObject:
   m_ObjectHideFlags: 0
@@ -4092,7 +4182,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9015396922818524253}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b2c86d0a497629f4eb6df6e47117bcd5, type: 3}
   m_Name: 

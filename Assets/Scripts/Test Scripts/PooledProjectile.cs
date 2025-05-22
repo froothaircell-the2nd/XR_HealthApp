@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PooledProjectile : PooledItem
+public class PooledProjectile : CT_PooledItem
 {
     [SerializeField]
     private float _targetVelocity = 10f;
