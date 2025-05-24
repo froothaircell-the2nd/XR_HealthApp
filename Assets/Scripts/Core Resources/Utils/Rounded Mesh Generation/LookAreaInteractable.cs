@@ -56,12 +56,5 @@ namespace CoreResources.Utils
                 transform.localPosition = _center + direction * clampedDistance;
             }
         }
-
-        private void Update()
-        {
-            
-        }
-
-        
     }
 }

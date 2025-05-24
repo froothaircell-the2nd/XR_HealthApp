@@ -181,7 +181,7 @@ namespace GameResources.Gameplay.WaveRig
                 var rot = mainCamera.transform.forward;
 
                 var raycastHitValid = Physics.SphereCast(pos, _spherecastRadius, rot, out RaycastHit hit, _maxRaycastRange, targetLayer);
-
+                
                 // Check if the raycast its an interactable object
                 if (raycastHitValid || CursorMode == CursorMode.Selected)
                 {

@@ -1,6 +1,7 @@
 using CoreResources.Managers.InputManagement;
 using CoreResources.Singleton;
 using CoreResources.Utils;
+using GameResources.Gameplay.WaveRig;
 using GameResources.Pooling;
 using System;
 using System.Collections;
@@ -96,8 +97,8 @@ namespace GameResources.Gameplay
         #region Private Methods
         private void OnPlay(int appPhase)
         {
-            if (InputManager.IsInstantiated)
-                InputManager.InputActions.XRILeftHandInteraction.UIPress.performed += OnTriggerClick;
+            if (CursorHandler.IsInstantiated)
+                CursorHandler.Instance.OnValidSelection += OnValidSelection;
 
             switch (appPhase)
             {
@@ -132,8 +133,8 @@ namespace GameResources.Gameplay
 
         private void OnExit()
         {
-            if (InputManager.IsInstantiated)
-                InputManager.InputActions.XRILeftHandInteraction.UIPress.performed -= OnTriggerClick;
+            if (CursorHandler.IsInstantiated)
+                CursorHandler.Instance.OnValidSelection -= OnValidSelection;
 
             ResetGame();
         }
@@ -190,8 +191,8 @@ namespace GameResources.Gameplay
         }
         #endregion
 
-        #region Input Listeners
-        private void OnTriggerClick(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+        #region Event Listeners
+        private void OnValidSelection(Transform objTransform, Collider objCollider)
         {
             var pos = _camHMD.position;
             var rot = _camHMD.forward;

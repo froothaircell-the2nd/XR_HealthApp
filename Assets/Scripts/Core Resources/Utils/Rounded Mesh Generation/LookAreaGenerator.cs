@@ -1,6 +1,7 @@
 using CoreResources.Managers.InputManagement;
 using CoreResources.Singleton;
 using GameResources.Gameplay;
+using GameResources.Gameplay.WaveRig;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -101,7 +102,7 @@ namespace CoreResources.Utils
             }
 
             _lookAreaModificationAllowed = true;
-            InputManager.InputActions.XRILeftHandInteraction.UIPress.performed += OnTriggerClick;
+            CursorHandler.Instance.OnValidSelection += OnValidSelection;
         }
 
         public void RestrictLookAreaModification()
@@ -111,6 +112,9 @@ namespace CoreResources.Utils
                 _interactables[i].DisableInteraction();
             }
 
+            if (CursorHandler.IsInstantiated)
+                CursorHandler.Instance.OnValidSelection -= OnValidSelection;
+            
             _lookAreaModificationAllowed = false;
         }
         #endregion
@@ -289,26 +293,14 @@ namespace CoreResources.Utils
         }
 
         #region Event Listeners
-        private void OnTriggerClick(InputAction.CallbackContext obj)
+        private void OnValidSelection(Transform objTransform, Collider objCollider)
         {
-            if (obj.performed)
+            var interactable = objCollider.GetComponent<LookAreaInteractable>();
+            if (interactable != null)
             {
-                var pos = _camHMD.position;
-                var rot = _camHMD.forward;
-                // var pos = InputManager.InputActions.XRIHead.Position.ReadValue<Vector3>();
-                // var rot = InputManager.InputActions.XRIHead.Rotation.ReadValue<Quaternion>();
-
-                if (Physics.SphereCast(pos, _spherecastRadius, rot, out var hit, _maxRaycastDistance, _collisionLayerMask.value))
-                {
-                    var interactable = hit.collider.GetComponent<LookAreaInteractable>();
-                    if (interactable != null)
-                    {
-                        _currentInteractable = interactable;
-                        _currentInteractable.SetHighlight(true);
-                        _triggerPressed = true;
-                    }
-                    // OnHit?.Invoke();
-                }
+                _currentInteractable = interactable;
+                _currentInteractable.SetHighlight(true);
+                _triggerPressed = true;
             }
         }
         #endregion
