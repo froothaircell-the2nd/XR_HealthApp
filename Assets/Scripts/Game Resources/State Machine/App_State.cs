@@ -1,5 +1,6 @@
 using CoreResources.StateMachine;
 using GameResources.Gameplay;
+using GameResources.Gameplay.WaveRig;
 using GameResources.UI;
 using UnityEngine;
 
@@ -35,12 +36,16 @@ namespace GameResources.StateMachine
         public override void OnEnter()
         {
             GameplayHandler.OnPlayEvent?.Invoke(1);
+            CursorHandler.Instance.EnableCursorInteraction(true, true);
         }
 
         public override void OnExit()
         {
             if (NextState != null && NextState.GetType() == typeof(AppState_InitMenu))
+            {
                 GameplayHandler.OnExitEvent?.Invoke();
+                CursorHandler.Instance.DisableCursorInteraction();
+            }
         }
     }
 
@@ -49,12 +54,16 @@ namespace GameResources.StateMachine
         public override void OnEnter()
         {
             GameplayHandler.OnPlayEvent?.Invoke(2);
+            CursorHandler.Instance.EnableCursorInteraction();
         }
 
         public override void OnExit()
         {
             if (NextState != null && NextState.GetType() == typeof(AppState_InitMenu))
+            {
                 GameplayHandler.OnExitEvent?.Invoke();
+                CursorHandler.Instance.DisableCursorInteraction();
+            }
         }
     }
 
@@ -63,12 +72,16 @@ namespace GameResources.StateMachine
         public override void OnEnter()
         {
             GameplayHandler.OnPlayEvent?.Invoke(3);
+            CursorHandler.Instance.EnableCursorInteraction(true, true);
         }
 
         public override void OnExit()
         {
             if (NextState != null && NextState.GetType() == typeof(AppState_InitMenu))
+            {
                 GameplayHandler.OnExitEvent?.Invoke();
+                CursorHandler.Instance.DisableCursorInteraction();
+            }
         }
     }
 

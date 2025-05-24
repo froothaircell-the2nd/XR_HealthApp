@@ -130,8 +130,8 @@ namespace GameResources.Gameplay.WaveRig
         }
         #endregion
 
-        #region Private Methods
-        private void EnableCursorInteraction(bool enableCursorSelection = true, bool enableCursorModification = false)
+        #region Public Methods
+        public void EnableCursorInteraction(bool enableCursorSelection = true, bool enableCursorModification = false)
         {
             _interactionEnabled = true;
             _selectionEnabled = enableCursorSelection;
@@ -146,7 +146,7 @@ namespace GameResources.Gameplay.WaveRig
             _cursorRefreshCoroutine = StartCoroutine(CursorModeRefreshCoroutine());
         }
 
-        private void DisableCursorInteraction()
+        public void DisableCursorInteraction()
         {
             _interactionEnabled = false;
             _selectionEnabled = false;
@@ -157,6 +157,9 @@ namespace GameResources.Gameplay.WaveRig
                 _cursorRefreshCoroutine = null;
             }
         }
+        #endregion
+
+        #region Private Methods
 
         private IEnumerator CursorModeRefreshCoroutine()
         {
