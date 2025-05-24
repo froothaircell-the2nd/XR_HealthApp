@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace GameResources.Gameplay
+namespace GameResources.Gameplay.WaveRig
 {
     public enum CursorRefreshMode
     {
@@ -55,19 +55,21 @@ namespace GameResources.Gameplay
         #endregion
 
         #region Private Properties
-        private bool _interactionEnabled = false;
-        private bool _selectionEnabled = false;
+        private bool _interactionEnabled = false,
+            _selectionEnabled = false,
+            _selectionSpriteModificationEnabled = false;
         private Vector2 _defaultCursorSize;
 
         private CursorRefreshMode _refreshMode = CursorRefreshMode.FixedTime;
         private CursorMode _cursorMode = CursorMode.Default;
         private Coroutine _cursorRefreshCoroutine;
         private Transform _cachedTargetTransform;
+        private Collider _cachedTargetCollider;
         #endregion
 
         #region Events
-        public Action OnValidInteraction;
-        public Action OnValidSelection;
+        public Action<Transform, Collider> OnValidInteraction;
+        public Action<Transform, Collider> OnValidSelection;
         public Action OnValidCancellation;
         #endregion
 
@@ -95,9 +97,11 @@ namespace GameResources.Gameplay
                             break;
                         case CursorMode.Interacting:
                             _cursorImage.sprite = _interactableSprite;
+
                             break;
                         case CursorMode.Selected:
-                            _cursorImage.sprite = _selectedSprite;
+                            if (_selectionSpriteModificationEnabled)
+                                _cursorImage.sprite = _selectedSprite;
                             break;
                     }
                 }
@@ -121,14 +125,17 @@ namespace GameResources.Gameplay
                 InputManager.InputActions.XRILeftHandInteraction.UIPress.performed -= OnSelectPerformed;
                 InputManager.InputActions.XRILeftHandInteraction.UIPress.canceled -= OnSelectCancelled;
             }
+
+            DisableCursorInteraction();
         }
         #endregion
 
         #region Private Methods
-        private void EnableCursorInteraction(bool enableCursorSelection = false)
+        private void EnableCursorInteraction(bool enableCursorSelection = true, bool enableCursorModification = false)
         {
             _interactionEnabled = true;
             _selectionEnabled = enableCursorSelection;
+            _selectionSpriteModificationEnabled = enableCursorSelection;
 
             if (_cursorRefreshCoroutine != null)
             {
@@ -183,13 +190,19 @@ namespace GameResources.Gameplay
                     {
                         if (raycastHitValid)
                         {
-                            if (_cachedTargetTransform == null)
+                            if (_cachedTargetTransform == null && _cachedTargetCollider == null)
+                            {
                                 _cachedTargetTransform = hit.transform; // cache for future use (but only if the original cache is clean
-                            
+                                _cachedTargetCollider = hit.collider;
+                            }
+
+                            OnValidSelection?.Invoke(_cachedTargetTransform, _cachedTargetCollider);
+
                             ResizeCursor(hit, pos, rot);
                             continue;
                         }
 
+                        OnValidSelection?.Invoke(_cachedTargetTransform, _cachedTargetCollider);
                         ResizeCursor(_cachedTargetTransform, pos, rot); // run with the cached transform instead
                         continue;
                     }
@@ -218,6 +231,9 @@ namespace GameResources.Gameplay
 
         private void ResizeCursor(Transform hitTransform, Vector3 camPos, Vector3 camRot)
         {
+            if (!_selectionSpriteModificationEnabled)
+                return;
+
             if (hitTransform == null)
             {
                 Debug.LogError("hitTransform not found");
@@ -269,22 +285,28 @@ namespace GameResources.Gameplay
             cursorUI.sizeDelta = _defaultCursorSize;
         }
 
+        #endregion
+        
         #region Event Listeners
         private void OnSelectPerformed(InputAction.CallbackContext obj)
         {
-            if (CursorMode == CursorMode.Interacting) // can only select when we get interactable objects in range
+            if (CursorMode == CursorMode.Interacting && _selectionEnabled) // can only select when we get interactable objects in range
+            {
                 CursorMode = CursorMode.Selected;
+            }
         }
 
         private void OnSelectCancelled(InputAction.CallbackContext obj)
         {
-            if (CursorMode == CursorMode.Selected)
+            if (CursorMode == CursorMode.Selected && _selectionEnabled)
             {
                 CursorMode = CursorMode.Interacting;
                 _cachedTargetTransform = null;
+                _cachedTargetCollider = null;
+
+                OnValidCancellation?.Invoke();
             }
         }
-        #endregion
         #endregion
     }
 }
