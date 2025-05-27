@@ -1260,7 +1260,7 @@ MonoBehaviour:
   m_LiveConeCastDebugVisuals: 0
   m_RaycastMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1783
   m_RaycastTriggerInteraction: 1
   m_RaycastSnapVolumeInteraction: 1
   m_HitClosestOnly: 0
@@ -1619,7 +1619,7 @@ MonoBehaviour:
   m_PhysicsCastDistance: 100
   m_PhysicsEventMask:
     serializedVersion: 2
-    m_Bits: 503
+    m_Bits: 247
   s_GraphicTags: []
   m_ShowRay: 1
   m_RayStartWidth: 0.01
@@ -1764,7 +1764,7 @@ GameObject:
   - component: {fileID: 4216945018428379333}
   - component: {fileID: 7019375998980735621}
   - component: {fileID: 8285703635706187244}
-  m_Layer: 5
+  m_Layer: 8
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1779,7 +1779,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4213112680111911214}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1788,7 +1788,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1.1, y: 1.1}
+  m_SizeDelta: {x: 0.55, y: 0.55}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7019375998980735621
 CanvasRenderer:
@@ -1972,7 +1972,8 @@ GameObject:
   - component: {fileID: 5862078289596477917}
   - component: {fileID: 8426462432742497154}
   - component: {fileID: 8312017494391047152}
-  m_Layer: 5
+  - component: {fileID: 3493635017928908148}
+  m_Layer: 8
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1987,7 +1988,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4801531229232184407}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 2}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2061,7 +2062,19 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 0
+--- !u!225 &3493635017928908148
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4801531229232184407}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &5350691960774759900
 GameObject:
   m_ObjectHideFlags: 0
@@ -3565,7 +3578,7 @@ MonoBehaviour:
   m_LiveConeCastDebugVisuals: 0
   m_RaycastMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1783
   m_RaycastTriggerInteraction: 1
   m_RaycastSnapVolumeInteraction: 1
   m_HitClosestOnly: 0
@@ -3924,7 +3937,7 @@ MonoBehaviour:
   m_PhysicsCastDistance: 100
   m_PhysicsEventMask:
     serializedVersion: 2
-    m_Bits: 503
+    m_Bits: 247
   s_GraphicTags: []
   m_ShowRay: 1
   m_RayStartWidth: 0.01
@@ -4358,7 +4371,7 @@ MonoBehaviour:
   _targetLayer:
     serializedVersion: 2
     m_Bits: 640
-  _paddingMultiplier: 1.1
+  _paddingMultiplier: 4.5
   _maxRaycastRange: 200
   _spherecastRadius: 0.2
   _raycastRefreshPeriod: 0.01

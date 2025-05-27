@@ -114,7 +114,7 @@ namespace GameResources.Gameplay.VRController
             _defaultCursorSize = _cursorImageRect.sizeDelta; // get the default cursor size for resetting later
             ResetCursorDimensions();
 
-            InputManager.OnInstatntiationComplete += OnInputManagerInitialized; // single-use binding to assign events after initialization
+            InputManager.OnInstantiationComplete += OnInputManagerInitialized; // single-use binding to assign events after initialization
         }
 
         public override void OnDeInit()
@@ -288,7 +288,7 @@ namespace GameResources.Gameplay.VRController
 
             if (InputManager.IsInstantiated)
             {
-                InputManager.OnInstatntiationComplete -= OnInputManagerInitialized;
+                InputManager.OnInstantiationComplete -= OnInputManagerInitialized;
             }
         }
 

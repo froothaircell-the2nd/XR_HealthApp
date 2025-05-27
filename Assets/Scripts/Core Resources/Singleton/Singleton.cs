@@ -263,7 +263,7 @@ namespace CoreResources.Singleton
 
         protected static bool _initializationComplete = false;
         public static bool IsInstantiated => _instance != null;
-        public static Action<T> OnInstatntiationComplete;
+        public static Action<T> OnInstantiationComplete;
         #endregion
 
         #region Overrides
@@ -282,7 +282,7 @@ namespace CoreResources.Singleton
                 OnInit();
 
                 _initializationComplete = true;
-                OnInstatntiationComplete?.Invoke(_instance);
+                OnInstantiationComplete?.Invoke(_instance);
             }
 
         }
