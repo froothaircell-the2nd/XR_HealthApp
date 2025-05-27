@@ -56,7 +56,8 @@ namespace GameResources.Gameplay.VRController
         #region Private Properties
         private bool _interactionEnabled = false,
             _selectionEnabled = false,
-            _selectionSpriteModificationEnabled = false;
+            _selectionSpriteModificationEnabled = false,
+            _inputsAssigned = false;
         private Vector2 _defaultCursorSize;
 
         private CursorRefreshMode _refreshMode = CursorRefreshMode.FixedTime;
@@ -114,12 +115,16 @@ namespace GameResources.Gameplay.VRController
             _defaultCursorSize = _cursorImageRect.sizeDelta; // get the default cursor size for resetting later
             ResetCursorDimensions();
 
-            InputManager.OnInstantiationComplete += OnInputManagerInitialized; // single-use binding to assign events after initialization
+            _inputsAssigned = false;
+
+            StartCoroutine(WaitForInputSystem());
         }
 
         public override void OnDeInit()
         {
-            if (InputManager.IsInstantiated)
+            StopAllCoroutines();
+
+            if (InputManager.IsInstantiated && _inputsAssigned)
             {
                 InputManager.InputActions.XRILeftHandInteraction.UIPress.performed -= OnSelectPerformed;
                 InputManager.InputActions.XRILeftHandInteraction.UIPress.canceled -= OnSelectCancelled;
@@ -159,6 +164,16 @@ namespace GameResources.Gameplay.VRController
         #endregion
 
         #region Private Methods
+        private IEnumerator WaitForInputSystem()
+        {
+            yield return new WaitUntil(() => InputManager.IsInstantiated);
+
+            InputManager.InputActions.XRILeftHandInteraction.UIPress.performed += OnSelectPerformed;
+            InputManager.InputActions.XRILeftHandInteraction.UIPress.canceled += OnSelectCancelled;
+
+            _inputsAssigned = true;
+        }
+
         private IEnumerator CursorModeRefreshCoroutine()
         {
             while (_interactionEnabled || _selectionEnabled)
@@ -281,17 +296,6 @@ namespace GameResources.Gameplay.VRController
         #endregion
         
         #region Event Listeners
-        private void OnInputManagerInitialized(InputManager inputManager)
-        {
-            InputManager.InputActions.XRILeftHandInteraction.UIPress.performed += OnSelectPerformed;
-            InputManager.InputActions.XRILeftHandInteraction.UIPress.canceled += OnSelectCancelled;
-
-            if (InputManager.IsInstantiated)
-            {
-                InputManager.OnInstantiationComplete -= OnInputManagerInitialized;
-            }
-        }
-
         private void OnSelectPerformed(InputAction.CallbackContext obj)
         {
             if (CursorMode == CursorMode.Interacting && _selectionEnabled) // can only select when we get interactable objects in range
