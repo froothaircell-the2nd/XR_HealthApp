@@ -2,13 +2,11 @@ using CoreResources.Managers.InputManagement;
 using CoreResources.Singleton;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
-namespace GameResources.Gameplay.WaveRig
+namespace GameResources.Gameplay.VRController
 {
     public enum CursorRefreshMode
     {
@@ -29,16 +27,17 @@ namespace GameResources.Gameplay.WaveRig
     {
         #region Serialized Properties
         [Header("References")]
-        [SerializeField] private Camera mainCamera;
-        [SerializeField] private RectTransform cursorUI; // UI element on the world-space canvas
+        [SerializeField] private Camera _mainCamera;
+        [SerializeField] private RectTransform _cursorImageRect; // UI element on the world-space canvas
+        [SerializeField] private RectTransform _cursorCanvasRect;
         [SerializeField] private Image _cursorImage;
 
         [Space(5)]
 
         [Header("Mutable Properties")]
-        [SerializeField] private float canvasDistance = 2.0f; // y distance from camera to canvas
-        [SerializeField] private LayerMask targetLayer;
-        [SerializeField] private float paddingMultiplier = 1.1f; // to slightly pad the cursor around the object
+        [SerializeField] private float _canvasDistance = 2.0f; // z distance from camera to canvas
+        [SerializeField] private LayerMask _targetLayer;
+        [SerializeField] private float _paddingMultiplier = 1.1f; // to slightly pad the cursor around the object
         [SerializeField] private float _maxRaycastRange = 80f, 
             _spherecastRadius = 1f, 
             _raycastRefreshPeriod = 0.3f;
@@ -112,10 +111,10 @@ namespace GameResources.Gameplay.WaveRig
         #region Overrides
         public override void OnInit()
         {
-            _defaultCursorSize = cursorUI.sizeDelta; // get the default cursor size for resetting later
+            _defaultCursorSize = _cursorImageRect.sizeDelta; // get the default cursor size for resetting later
+            ResetCursorDimensions();
 
-            InputManager.InputActions.XRILeftHandInteraction.UIPress.performed += OnSelectPerformed;
-            InputManager.InputActions.XRILeftHandInteraction.UIPress.canceled += OnSelectCancelled;
+            InputManager.OnInstatntiationComplete += OnInputManagerInitialized; // single-use binding to assign events after initialization
         }
 
         public override void OnDeInit()
@@ -160,7 +159,6 @@ namespace GameResources.Gameplay.WaveRig
         #endregion
 
         #region Private Methods
-
         private IEnumerator CursorModeRefreshCoroutine()
         {
             while (_interactionEnabled || _selectionEnabled)
@@ -180,10 +178,10 @@ namespace GameResources.Gameplay.WaveRig
                         break;
                 }
 
-                var pos = mainCamera.transform.position;
-                var rot = mainCamera.transform.forward;
+                var pos = _mainCamera.transform.position;
+                var rot = _mainCamera.transform.forward;
 
-                var raycastHitValid = Physics.SphereCast(pos, _spherecastRadius, rot, out RaycastHit hit, _maxRaycastRange, targetLayer);
+                var raycastHitValid = Physics.SphereCast(pos, _spherecastRadius, rot, out RaycastHit hit, _maxRaycastRange, _targetLayer);
                 
                 // Check if the raycast its an interactable object
                 if (raycastHitValid || CursorMode == CursorMode.Selected)
@@ -211,12 +209,12 @@ namespace GameResources.Gameplay.WaveRig
                     }
 
                     // In interaction state
-                    ResetCursorSize();
+                    ResetCursorDimensions();
                     CursorMode = CursorMode.Interacting;
                     continue;
                 }
 
-                ResetCursorSize();
+                ResetCursorDimensions();
                 CursorMode = CursorMode.Default;
             }
 
@@ -245,52 +243,55 @@ namespace GameResources.Gameplay.WaveRig
 
             Transform target = hitTransform;
             var targetPos = target.position;
-
-            float x = Vector3.Distance(camPos, targetPos); // distance to object
-            float y = canvasDistance; // canvas fixed distance
-
+            
             // Get bounds of the object (assumes Renderer is on root)
             Renderer renderer = target.GetComponent<Renderer>();
             if (renderer == null) return;
 
+            float x = Vector3.Distance(camPos, targetPos); // distance to object
+            float y = _canvasDistance; // canvas fixed distance
+
             float objectHeight = renderer.bounds.size.y; // height in world units
 
-            // Calculate the screen-space projected height at distance x
-            Vector3 topPoint = targetPos + Vector3.up * (objectHeight / 2);
-            Vector3 bottomPoint = targetPos - Vector3.up * (objectHeight / 2);
+            // Projected height of object at canvas distance using similar triangles
+            float projectedWorldHeightAtCanvas = objectHeight * (y / x) * _paddingMultiplier;
 
-            Vector3 topScreen = mainCamera.WorldToScreenPoint(topPoint);
-            Vector3 bottomScreen = mainCamera.WorldToScreenPoint(bottomPoint);
+            // Convert world height to local canvas units using lossyScale
+            float localScaleY = _cursorImageRect.lossyScale.y;
+            float sizeDeltaY = projectedWorldHeightAtCanvas / localScaleY;
 
-            float projectedScreenHeight = Mathf.Abs(topScreen.y - bottomScreen.y);
+            // Set sizeDelta (assumes square cursor)
+            _cursorImageRect.sizeDelta = new Vector2(sizeDeltaY, sizeDeltaY);
 
-            // Projected height at canvas distance y using linear perspective scale
-            float scaledHeight = projectedScreenHeight * (y / x);
+            // Position the cursor at canvas distance along the camera ray
+            Vector3 dir = (hitTransform.position - camPos).normalized;
+            Vector3 newCursorPos = camPos + dir * y;
 
-            // Convert screen height to world space on canvas (world space canvas uses local scale)
-            float canvasHeight = mainCamera.pixelHeight;
-            float worldUnitScale = cursorUI.sizeDelta.y / canvasHeight;
-            float adjustedHeight = scaledHeight * worldUnitScale * paddingMultiplier;
-
-            // Set the cursor size (assuming square, can use width separately)
-            cursorUI.sizeDelta = new Vector2(adjustedHeight, adjustedHeight);
-
-            // Fix position: interpolate between object and camera center, but clamp to y distance
-            Vector3 dir = (targetPos - mainCamera.transform.position).normalized;
-            Vector3 desiredCursorPos = mainCamera.transform.position + dir * y;
-
-            cursorUI.position = desiredCursorPos;
-            cursorUI.rotation = Quaternion.LookRotation(dir);
+            _cursorImageRect.position = newCursorPos;
+            _cursorImageRect.rotation = Quaternion.LookRotation(dir);
         }
 
-        private void ResetCursorSize()
+        private void ResetCursorDimensions()
         {
-            cursorUI.sizeDelta = _defaultCursorSize;
+            _cursorImageRect.sizeDelta = _defaultCursorSize;
+            _cursorImageRect.localPosition = new Vector3(0, 0, _canvasDistance);
+            _cursorImageRect.localRotation = Quaternion.identity;
         }
 
         #endregion
         
         #region Event Listeners
+        private void OnInputManagerInitialized(InputManager inputManager)
+        {
+            InputManager.InputActions.XRILeftHandInteraction.UIPress.performed += OnSelectPerformed;
+            InputManager.InputActions.XRILeftHandInteraction.UIPress.canceled += OnSelectCancelled;
+
+            if (InputManager.IsInstantiated)
+            {
+                InputManager.OnInstatntiationComplete -= OnInputManagerInitialized;
+            }
+        }
+
         private void OnSelectPerformed(InputAction.CallbackContext obj)
         {
             if (CursorMode == CursorMode.Interacting && _selectionEnabled) // can only select when we get interactable objects in range

@@ -1,7 +1,7 @@
 using CoreResources.Managers.InputManagement;
 using CoreResources.Singleton;
 using CoreResources.Utils;
-using GameResources.Gameplay.WaveRig;
+using GameResources.Gameplay.VRController;
 using GameResources.Pooling;
 using System;
 using System.Collections;

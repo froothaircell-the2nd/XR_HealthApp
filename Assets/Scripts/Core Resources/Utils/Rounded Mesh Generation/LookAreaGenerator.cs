@@ -1,7 +1,7 @@
 using CoreResources.Managers.InputManagement;
 using CoreResources.Singleton;
 using GameResources.Gameplay;
-using GameResources.Gameplay.WaveRig;
+using GameResources.Gameplay.VRController;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;

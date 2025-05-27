@@ -1788,7 +1788,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0.25, y: 0.25}
+  m_SizeDelta: {x: 1.1, y: 1.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7019375998980735621
 CanvasRenderer:
@@ -1987,7 +1987,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4801531229232184407}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3074,7 +3074,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -4186,7 +4186,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -4350,17 +4350,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b1249a19323a85146a889831889bfa66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainCamera: {fileID: 2948182455428597478}
-  cursorUI: {fileID: 4216945018428379333}
+  _mainCamera: {fileID: 2948182455428597478}
+  _cursorImageRect: {fileID: 4216945018428379333}
+  _cursorCanvasRect: {fileID: 4655759542595917270}
   _cursorImage: {fileID: 8285703635706187244}
-  canvasDistance: 2
-  targetLayer:
+  _canvasDistance: 2
+  _targetLayer:
     serializedVersion: 2
     m_Bits: 640
-  paddingMultiplier: 1.1
-  _maxRaycastRange: 80
-  _spherecastRadius: 1
-  _raycastRefreshPeriod: 0.3
+  _paddingMultiplier: 1.1
+  _maxRaycastRange: 200
+  _spherecastRadius: 0.2
+  _raycastRefreshPeriod: 0.01
   _defaultSprite: {fileID: 21300000, guid: f2eb7ace632f139409c46e022feb2240, type: 3}
   _interactableSprite: {fileID: 21300000, guid: d828fbef127800341a4478650aa590cd, type: 3}
   _selectedSprite: {fileID: 21300000, guid: 395ee20ca0c23494a9b653d7f0fd91c4, type: 3}

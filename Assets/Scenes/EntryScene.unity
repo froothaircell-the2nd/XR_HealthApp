@@ -4079,11 +4079,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1007395437889857441, guid: 73d680c6fe00f2c4b9cc8785619ff823, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1007395437889857441, guid: 73d680c6fe00f2c4b9cc8785619ff823, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.20700026
+      value: -0.20700073
       objectReference: {fileID: 0}
     - target: {fileID: 1007395437889857441, guid: 73d680c6fe00f2c4b9cc8785619ff823, type: 3}
       propertyPath: m_LocalPosition.z
@@ -4115,6 +4115,14 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1007395437889857441, guid: 73d680c6fe00f2c4b9cc8785619ff823, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4216945018428379333, guid: 73d680c6fe00f2c4b9cc8785619ff823, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 4655759542595917270, guid: 73d680c6fe00f2c4b9cc8785619ff823, type: 3}
+      propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -4149,7 +4157,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1426362291
 Transform:
   m_ObjectHideFlags: 0
@@ -4636,7 +4644,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7e2f4617667341945b5a7756e14b62d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_InteractionManager: {fileID: 0}
+  m_InteractionManager: {fileID: 1390696265}
   m_Colliders: []
   m_InteractionLayerMask:
     serializedVersion: 2

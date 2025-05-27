@@ -1,6 +1,6 @@
 using CoreResources.StateMachine;
 using GameResources.Gameplay;
-using GameResources.Gameplay.WaveRig;
+using GameResources.Gameplay.VRController;
 using GameResources.UI;
 using UnityEngine;
 

@@ -4,6 +4,7 @@ using GameResources.Pooling;
 using UnityEngine;
 using GameResources.UI;
 using GameResources.Gameplay;
+using GameResources.Gameplay.VRController;
 
 namespace GameResources.StateMachine
 {
