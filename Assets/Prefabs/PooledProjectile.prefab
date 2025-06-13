@@ -151,4 +151,4 @@ MonoBehaviour:
   _rb: {fileID: 6381193690023294858}
   _validCollisionLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64

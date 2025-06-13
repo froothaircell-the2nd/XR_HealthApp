@@ -1,3 +1,4 @@
+using GameResources.Gameplay;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -5,7 +6,7 @@ using UnityEngine;
 
 namespace CoreResources.Utils
 {
-    public class LookAreaInteractable : MonoBehaviour
+    public class LookAreaInteractable : MonoBehaviour, ICursorInteractable
     {
         [SerializeField, ColorUsage(true, true)]
         private Color _highlightColor;
@@ -18,6 +19,12 @@ namespace CoreResources.Utils
         private Renderer _renderer;
         private Color _defaultColor;
         private bool _isInteractable = false;
+
+        public bool IsInteractable
+        {
+            get => _isInteractable;
+            private set => _isInteractable = value;
+        }
 
         public void InitializeInteractable()
         {

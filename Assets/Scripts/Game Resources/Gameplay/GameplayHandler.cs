@@ -55,6 +55,7 @@ namespace GameResources.Gameplay
         private Quaternion _defaultSpawnRotation;
         private Coroutine _spawnCoroutine;
         private int _spawnCount;
+        private bool _triggerPressed;
         private AppPhase _phase;
         #endregion
 
@@ -98,7 +99,10 @@ namespace GameResources.Gameplay
         private void OnPlay(int appPhase)
         {
             if (CursorHandler.IsInstantiated)
+            {
                 CursorHandler.Instance.OnValidSelection += OnValidSelection;
+                CursorHandler.Instance.OnValidCancellation += OnValidSelectionCancelled;
+            }
 
             switch (appPhase)
             {
@@ -134,9 +138,33 @@ namespace GameResources.Gameplay
         private void OnExit()
         {
             if (CursorHandler.IsInstantiated)
+            {
                 CursorHandler.Instance.OnValidSelection -= OnValidSelection;
+                CursorHandler.Instance.OnValidCancellation -= OnValidSelectionCancelled;
+            }
 
             ResetGame();
+        }
+
+        private void InitializeCenterCursor(PooledItem item)
+        {
+            var res = (ProjectileController) item;
+
+            res.InitializeItem(ProjectileMode.CenteringReticle);
+        }
+
+        private void InitalizePhase2Projectile(PooledItem item)
+        {
+            var res = (ProjectileController) item;
+
+            res.InitializeItem(ProjectileMode.Phase2Projectile);
+        }
+
+        private void InitializePhase3Projectile(PooledItem item)
+        {
+            var res = (ProjectileController) item;
+
+            res.InitializeItem(ProjectileMode.Phase3Projectile);
         }
 
         private void ResetGame()
@@ -183,7 +211,7 @@ namespace GameResources.Gameplay
                 _spawnCenter.localPosition = Vector3.zero;
                 _spawnCenter.position = pos;
                 _spawnCenter.LookAt(_camHMD);
-                _pool.SpawnItem(_spawnCenter.position, _spawnCenter.rotation);
+                _pool.SpawnItem(_spawnCenter.position, _spawnCenter.rotation, InitalizePhase2Projectile);
                 _spawnCount++;
             }
 
@@ -194,16 +222,17 @@ namespace GameResources.Gameplay
         #region Event Listeners
         private void OnValidSelection(Transform objTransform, Collider objCollider)
         {
-            var pos = _camHMD.position;
-            var rot = _camHMD.forward;
-            // var pos = InputManager.InputActions.XRIHead.Position.ReadValue<Vector3>();
-            // var rot = InputManager.InputActions.XRIHead.Rotation.ReadValue<Quaternion>();
-
-            if (Physics.Raycast(pos, rot, out var hit, _maxRaycastDistance, _collisionLayerMask.value))
+            if (!_triggerPressed && (_collisionLayerMask.value & (1 << objCollider.gameObject.layer)) > 0)
             {
-                hit.collider.GetComponent<ProjectileController>().ReturnToPool();
+                objCollider.GetComponent<ProjectileController>().ReturnToPool();
                 OnHit?.Invoke();
+                _triggerPressed = true;
             }
+        }
+
+        private void OnValidSelectionCancelled()
+        {
+            _triggerPressed = false;
         }
         #endregion
     }

@@ -201,6 +201,12 @@ namespace GameResources.Gameplay.VRController
                 // Check if the raycast its an interactable object
                 if (raycastHitValid || CursorMode == CursorMode.Selected)
                 {
+                    var collider = hit.collider;
+                    var trnsfrm = hit.transform;
+
+                    if (collider != null && !collider.gameObject.GetComponent<ICursorInteractable>().IsInteractable)
+                        continue;
+
                     // In selection state
                     if (CursorMode == CursorMode.Selected)
                     {
@@ -208,8 +214,8 @@ namespace GameResources.Gameplay.VRController
                         {
                             if (_cachedTargetTransform == null && _cachedTargetCollider == null)
                             {
-                                _cachedTargetTransform = hit.transform; // cache for future use (but only if the original cache is clean
-                                _cachedTargetCollider = hit.collider;
+                                _cachedTargetTransform = trnsfrm; // cache for future use (but only if the original cache is clean
+                                _cachedTargetCollider = collider;
                             }
 
                             OnValidSelection?.Invoke(_cachedTargetTransform, _cachedTargetCollider);
@@ -225,6 +231,10 @@ namespace GameResources.Gameplay.VRController
 
                     // In interaction state
                     ResetCursorDimensions();
+
+                    if ((CursorMode & (CursorMode.Selected | CursorMode.Interacting)) == 0)
+                        OnValidInteraction?.Invoke(trnsfrm, collider);
+
                     CursorMode = CursorMode.Interacting;
                     continue;
                 }
