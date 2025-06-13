@@ -47,6 +47,8 @@ namespace GameResources.Gameplay
         [SerializeField]
         private float _maxRaycastDistance = 50;
         [SerializeField]
+        private int _phase2SpawnCount = 15;
+        [SerializeField]
         private Transform _camHMD;
         #endregion
 
@@ -193,7 +195,7 @@ namespace GameResources.Gameplay
 
         private IEnumerator SpawnCoroutine_AppP1()
         {
-            while (_spawnCount < 15)
+            while (_spawnCount <= _phase2SpawnCount)
             {
                 // var angleRad = UnityEngine.Random.Range(0f, 360f).ToRadians();
                 // var radius = UnityEngine.Random.Range(_minSpawnRadius2, _maxSpawnRadius2);
@@ -212,7 +214,7 @@ namespace GameResources.Gameplay
                 _spawnCenter.position = pos;
                 _spawnCenter.LookAt(_camHMD);
                 _pool.SpawnItem(_spawnCenter.position, _spawnCenter.rotation, InitalizePhase2Projectile);
-                _spawnCount++;
+                ++_spawnCount;
             }
 
             ResetGame();
