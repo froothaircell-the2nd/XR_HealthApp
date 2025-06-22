@@ -1,4 +1,8 @@
+using DG.Tweening;
+using DG.Tweening.Core;
+using DG.Tweening.Plugins.Options;
 using GameResources.Pooling;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -19,14 +23,32 @@ namespace GameResources.Gameplay
         private float _targetVelocity = 10f;
         [SerializeField, Range(0f, 1f)]
         private float _velocityBlendStrength = 0.5f;
+        [SerializeField, Range(0f, 10f)]
+        private float _centeringReticleResizingDuration;
+        [SerializeField, Range(0f, 2f)]
+        private float _centeringReticleResettingDuration;
         [SerializeField]
         private Rigidbody _rb;
         [SerializeField]
         private LayerMask _validCollisionLayers;
+        [SerializeField, ColorUsage(true, true)]
+        private Color _centeringReticleColor, 
+            _phase2ProjectileColor, 
+            _phase3ProjectileColor;
 
+        #region Private Properties
+        private Material _projectileMaterial;
         private ProjectileMode _currentProjectileMode = ProjectileMode.Phase2Projectile;
         private Vector3 _currentVelocity = Vector3.zero;
         private bool _isInteractable = false;
+        private bool _centeringReticleContracting = false;
+        private float _originalScale = 1.2f, _finalScale = 0.35f;
+
+        private TweenerCore<Vector3, Vector3, VectorOptions> _centeringReticleResizingTween = null;
+        #endregion
+
+        #region Public Properties
+        public Action OnCenteringReticleDespawned = null;
 
         public bool IsInteractable
         {
@@ -45,18 +67,54 @@ namespace GameResources.Gameplay
             }
         }
 
+        public bool CenteringReticleContracting
+        {
+            get { return _centeringReticleContracting; }
+            set
+            {
+                if (!_isPooled && CurrentProjectileMode == ProjectileMode.CenteringReticle)
+                {
+                    _centeringReticleContracting = value;
+                }
+            }
+        }
+        #endregion
+
         #region Overrides
         protected override void OnSpawn()
         {
             _currentVelocity = Vector3.zero;
+            _originalScale = transform.localScale.x; // Only taking one dimension since the dimensions will be equal
+
+            if (_projectileMaterial == null)
+                _projectileMaterial = gameObject.GetComponent<MeshRenderer>().material;
+
+            switch (CurrentProjectileMode)
+            {
+                case ProjectileMode.CenteringReticle:
+                    _projectileMaterial.SetColor("_EmissionColor", _centeringReticleColor);
+                    break;
+                case ProjectileMode.Phase2Projectile:
+                default:
+                    _projectileMaterial.SetColor("_EmissionColor", _phase2ProjectileColor);
+                    break;
+                case ProjectileMode.Phase3Projectile:
+                    _projectileMaterial.SetColor("_EmissionColor", _phase3ProjectileColor);
+                    break;
+            }
         }
 
         protected override void OnDespawn()
         {
             _currentVelocity = Vector3.zero;
-            _isInteractable = false;
-        }
 
+            transform.localScale = Vector3.one;
+            transform.localScale = Vector3.zero;
+            transform.rotation = Quaternion.identity;
+
+            _isInteractable = false;
+            _centeringReticleContracting = false;
+        }
 
         private void Update()
         {
@@ -89,7 +147,20 @@ namespace GameResources.Gameplay
         #region Private Methods
         private void SimulateCenteringReticle()
         {
+            if (!IsPooled)
+            {
+                if (_centeringReticleContracting && _centeringReticleResizingTween == null)
+                {
+                    _centeringReticleResizingTween = transform.DOScale(_finalScale, _centeringReticleResizingDuration).OnComplete(() => DespawnCenteringReticle());
+                }
+                else if (!_centeringReticleContracting && _centeringReticleResizingTween != null)
+                {
+                    _centeringReticleResizingTween.Kill();
+                    _centeringReticleResizingTween = null;
 
+                    transform.DOScale(_originalScale, _centeringReticleResettingDuration);
+                }
+            }
         }
 
         private void SimulatePhase2Projectile()
@@ -109,6 +180,14 @@ namespace GameResources.Gameplay
         {
 
         }
+
+        private void DespawnCenteringReticle()
+        {
+            OnCenteringReticleDespawned?.Invoke();
+            OnCenteringReticleDespawned = null;
+
+            ReturnToPool();
+        }
         #endregion
 
         #region Public Methods
@@ -116,6 +195,15 @@ namespace GameResources.Gameplay
         {
             CurrentProjectileMode = mode;
             IsInteractable = true;
+        }
+
+        public void HandleSelectionEnter()
+        {
+            if (CurrentProjectileMode == ProjectileMode.Phase2Projectile)
+            {
+                GameplayHandler.OnPhase2Hit?.Invoke();
+                ReturnToPool();
+            }
         }
         #endregion
     }

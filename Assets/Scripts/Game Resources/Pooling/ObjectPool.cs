@@ -61,7 +61,7 @@ namespace GameResources.Pooling
 
         public PooledItem SpawnItem(Vector3 position, Quaternion rotation, 
             Action<PooledItem> beforeSpawn = null, 
-            Action<PooledItem> onSpawn = null)
+            Action<PooledItem> afterSpawn = null)
         {
             if (!_poolLocked && (_pool == null || _pool.Count == 0))
                 return null;
@@ -70,18 +70,12 @@ namespace GameResources.Pooling
             _pool.RemoveAt(0);
             _spawnedItems.Add(item);
 
-            if (beforeSpawn != null)
-            {
-                beforeSpawn?.Invoke(item);
-            }
+            beforeSpawn?.Invoke(item);
 
             item.transform.parent = null;
             item.SpawnItem(position, rotation);
 
-            if (onSpawn != null)
-            {
-                onSpawn?.Invoke(item);
-            }
+            afterSpawn?.Invoke(item);
 
             return item;
         }

@@ -468,7 +468,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
-  direction: {x: 0, y: 0, z: 0}
   minDistance: 0.5
   maxDistance: 8
 --- !u!54 &153689096
@@ -1198,7 +1197,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
-  direction: {x: 0, y: 0, z: 0}
   minDistance: 0.5
   maxDistance: 8
 --- !u!23 &293028970
@@ -1560,7 +1558,7 @@ Transform:
   m_GameObject: {fileID: 442297609}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 50}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1615,7 +1613,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
-  direction: {x: 0, y: 0, z: 0}
   minDistance: 0.5
   maxDistance: 8
 --- !u!54 &495841029
@@ -2434,7 +2431,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
-  direction: {x: 0, y: 0, z: 0}
   minDistance: 0.5
   maxDistance: 8
 --- !u!54 &707248867
@@ -2782,7 +2778,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
-  direction: {x: 0, y: 0, z: 0}
   minDistance: 0.5
   maxDistance: 8
 --- !u!54 &873484179
@@ -2932,7 +2927,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
-  direction: {x: 0, y: 0, z: 0}
   minDistance: 0.5
   maxDistance: 8
 --- !u!23 &921883819
@@ -3168,6 +3162,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   _maxRaycastDistance: 50
+  _phase2SpawnCount: 15
   _camHMD: {fileID: 70537001}
 --- !u!1 &962655854
 GameObject:
@@ -3714,7 +3709,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
-  direction: {x: 0, y: 0, z: 0}
   minDistance: 0.5
   maxDistance: 8
 --- !u!54 &1204335886
@@ -4222,7 +4216,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1501821580}
   m_Layer: 0
-  m_Name: Game Set - Application Phase 1
+  m_Name: Game Set - Application Phase 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4237,7 +4231,7 @@ Transform:
   m_GameObject: {fileID: 1501821579}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 35}
+  m_LocalPosition: {x: 0, y: 0, z: 25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4327,7 +4321,7 @@ GameObject:
   - component: {fileID: 1623276156}
   - component: {fileID: 1623276158}
   m_Layer: 10
-  m_Name: Look Area Generator
+  m_Name: Look Area Generator - Application Phase 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4857,7 +4851,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
-  direction: {x: 0, y: 0, z: 0}
   minDistance: 0.5
   maxDistance: 8
 --- !u!23 &1972941862

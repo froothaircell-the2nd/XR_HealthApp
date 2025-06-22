@@ -57,8 +57,12 @@ namespace GameResources.Gameplay
         private Quaternion _defaultSpawnRotation;
         private Coroutine _spawnCoroutine;
         private int _spawnCount;
-        private bool _triggerPressed;
+        private bool _triggerPressed,
+            _centeringReticleDespawned = false,
+            _phase2ProjectileDespawned = false;
         private AppPhase _phase;
+
+        private ProjectileController _cachedProjectile = null;
         #endregion
 
         public AppPhase Phase => _phase;
@@ -71,7 +75,7 @@ namespace GameResources.Gameplay
         /// </summary>
         public static Action<int> OnPlayEvent;
         public static Action OnExitEvent;
-        public static Action OnHit;
+        public static Action OnPhase2Hit;
         #endregion
 
         #region Overrides
@@ -84,12 +88,14 @@ namespace GameResources.Gameplay
 
             OnPlayEvent += OnPlay;
             OnExitEvent += OnExit;
+            OnPhase2Hit += OnPhase2HitPerformed;
         }
 
         public override void OnDeInit()
         {
-            OnPlayEvent -= OnPlay;
-            OnExitEvent -= OnExit;
+            OnPlayEvent = null;
+            OnExitEvent = null;
+            OnPhase2Hit = null;
 
             _dataHandler.CleanSingleton();
 
@@ -104,6 +110,9 @@ namespace GameResources.Gameplay
             {
                 CursorHandler.Instance.OnValidSelection += OnValidSelection;
                 CursorHandler.Instance.OnValidCancellation += OnValidSelectionCancelled;
+                CursorHandler.Instance.OnValidInteractionStarted += OnValidInteractionStarted;
+                CursorHandler.Instance.OnValidInteractionPerformed += OnValidInteractionPerformed;
+                CursorHandler.Instance.OnValidInteractionCancelled += OnValidInteractionCancelled;
             }
 
             switch (appPhase)
@@ -124,6 +133,9 @@ namespace GameResources.Gameplay
                 case 2:
                     _lookAreaGenerator.RestrictLookAreaModification();
 
+                    _phase2ProjectileDespawned = false;
+                    _centeringReticleDespawned = false;
+
                     _pool.UnlockPool();
                     _spawnCoroutine = StartCoroutine(SpawnCoroutine_AppP1());
 
@@ -136,16 +148,21 @@ namespace GameResources.Gameplay
             }
         }
 
-
         private void OnExit()
         {
             if (CursorHandler.IsInstantiated)
             {
                 CursorHandler.Instance.OnValidSelection -= OnValidSelection;
                 CursorHandler.Instance.OnValidCancellation -= OnValidSelectionCancelled;
+                CursorHandler.Instance.OnValidInteractionPerformed -= OnValidInteractionPerformed;
             }
 
             ResetGame();
+        }
+
+        private void OnPhase2HitPerformed()
+        {
+            _phase2ProjectileDespawned = true;
         }
 
         private void InitializeCenterCursor(PooledItem item)
@@ -153,6 +170,7 @@ namespace GameResources.Gameplay
             var res = (ProjectileController) item;
 
             res.InitializeItem(ProjectileMode.CenteringReticle);
+            res.OnCenteringReticleDespawned += () => { _centeringReticleDespawned = true; };
         }
 
         private void InitalizePhase2Projectile(PooledItem item)
@@ -177,7 +195,16 @@ namespace GameResources.Gameplay
                 _spawnCoroutine = null;
             }
 
+            if (_cachedProjectile != null)
+            {
+                _cachedProjectile.ReturnToPool();
+                _cachedProjectile = null;
+            }
+
             _phase = 0;
+
+            _centeringReticleDespawned = false;
+            _phase2ProjectileDespawned = false;
 
             _spawnCenter.localPosition = _defaultSpawnPosition;
             _spawnCenter.rotation = _defaultSpawnRotation;
@@ -204,17 +231,26 @@ namespace GameResources.Gameplay
                 pos += (dir * UnityEngine.Random.Range(0f, _maxSpawnDistance));
 
                 // Access the look area handler and use the spawn function
-                
-                var delay = UnityEngine.Random.Range(_minSpawnDelay, _maxSpawnDelay);
+                // var delay = UnityEngine.Random.Range(_minSpawnDelay, _maxSpawnDelay);
 
-                yield return new WaitForSecondsRealtime(delay);
+                // yield return new WaitForSecondsRealtime(delay);
+                _spawnCenter.localPosition = Vector3.zero;
+                _spawnCenter.localRotation = Quaternion.identity;
+                _pool.SpawnItem(_spawnCenter.position, _spawnCenter.rotation, InitializeCenterCursor);
+
+                yield return new WaitUntil(() => _centeringReticleDespawned);
 
                 // spawn on a random location within a radius range and angle range
-                _spawnCenter.localPosition = Vector3.zero;
                 _spawnCenter.position = pos;
                 _spawnCenter.LookAt(_camHMD);
                 _pool.SpawnItem(_spawnCenter.position, _spawnCenter.rotation, InitalizePhase2Projectile);
                 ++_spawnCount;
+
+                _centeringReticleDespawned = false;
+
+                yield return new WaitUntil(() => _phase2ProjectileDespawned);
+
+                _phase2ProjectileDespawned = false;
             }
 
             ResetGame();
@@ -226,8 +262,11 @@ namespace GameResources.Gameplay
         {
             if (!_triggerPressed && (_collisionLayerMask.value & (1 << objCollider.gameObject.layer)) > 0)
             {
-                objCollider.GetComponent<ProjectileController>().ReturnToPool();
-                OnHit?.Invoke();
+                var currSelection = objCollider.GetComponent<ProjectileController>();
+                currSelection.HandleSelectionEnter();
+                
+                // objCollider.GetComponent<ProjectileController>().ReturnToPool();
+                // OnHit?.Invoke();
                 _triggerPressed = true;
             }
         }
@@ -235,6 +274,39 @@ namespace GameResources.Gameplay
         private void OnValidSelectionCancelled()
         {
             _triggerPressed = false;
+        }
+
+        private void OnValidInteractionStarted(Transform transform, Collider collider)
+        {
+            var currProj = transform.GetComponent<ProjectileController>();
+
+            if (_cachedProjectile != null && _cachedProjectile != currProj)
+            {
+                _cachedProjectile.CenteringReticleContracting = false;
+            }
+
+            _cachedProjectile = currProj;
+            
+            if (_cachedProjectile != null && !_centeringReticleDespawned)
+            {
+                _cachedProjectile.CenteringReticleContracting = true;
+            }
+        }
+
+        private void OnValidInteractionPerformed(Transform transform, Collider collider)
+        {
+            // Debug.Log("Interaction Scripts working");
+            
+        }
+
+        private void OnValidInteractionCancelled()
+        {
+            // var currProjectile = transform.GetComponent<ProjectileController>();
+
+            if (_cachedProjectile != null && !_centeringReticleDespawned)
+            {
+                _cachedProjectile.CenteringReticleContracting = false;
+            }
         }
         #endregion
     }

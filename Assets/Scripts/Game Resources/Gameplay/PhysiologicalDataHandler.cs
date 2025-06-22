@@ -22,7 +22,7 @@ namespace GameResources.Gameplay
 
             ResetMetrics();
 
-            GameplayHandler.OnHit += IncrementScore;
+            GameplayHandler.OnPhase2Hit += IncrementScore;
         }
 
         public override void CleanSingleton()
@@ -31,7 +31,7 @@ namespace GameResources.Gameplay
 
             OnScoreUpdated = null;
             
-            GameplayHandler.OnHit -= IncrementScore;
+            GameplayHandler.OnPhase2Hit -= IncrementScore;
 
             base.CleanSingleton();
         }

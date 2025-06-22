@@ -148,7 +148,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _targetVelocity: 5
   _velocityBlendStrength: 0.16
+  _centeringReticleResizingDuration: 5
+  _centeringReticleResettingDuration: 0.45
   _rb: {fileID: 6381193690023294858}
   _validCollisionLayers:
     serializedVersion: 2
     m_Bits: 64
+  _centeringReticleColor: {r: 11.984314, g: 0.50954455, b: 0, a: 1}
+  _phase2ProjectileColor: {r: 0, g: 3.8170047, b: 11.984314, a: 1}
+  _phase3ProjectileColor: {r: 0.16362232, g: 11.984314, b: 0, a: 1}

@@ -57,7 +57,8 @@ namespace GameResources.Gameplay.VRController
         private bool _interactionEnabled = false,
             _selectionEnabled = false,
             _selectionSpriteModificationEnabled = false,
-            _inputsAssigned = false;
+            _inputsAssigned = false,
+            _interactionStarted = false;
         private Vector2 _defaultCursorSize;
 
         private CursorRefreshMode _refreshMode = CursorRefreshMode.FixedTime;
@@ -68,7 +69,9 @@ namespace GameResources.Gameplay.VRController
         #endregion
 
         #region Events
-        public Action<Transform, Collider> OnValidInteraction;
+        public Action<Transform, Collider> OnValidInteractionStarted;
+        public Action<Transform, Collider> OnValidInteractionPerformed;
+        public Action OnValidInteractionCancelled;
         public Action<Transform, Collider> OnValidSelection;
         public Action OnValidCancellation;
         #endregion
@@ -154,6 +157,7 @@ namespace GameResources.Gameplay.VRController
         {
             _interactionEnabled = false;
             _selectionEnabled = false;
+            _interactionStarted = false;
 
             if (_cursorRefreshCoroutine != null)
             {
@@ -233,7 +237,13 @@ namespace GameResources.Gameplay.VRController
                     ResetCursorDimensions();
 
                     if ((CursorMode & (CursorMode.Selected | CursorMode.Interacting)) == 0)
-                        OnValidInteraction?.Invoke(trnsfrm, collider);
+                    {
+                        OnValidInteractionStarted?.Invoke(trnsfrm, collider);
+                        _interactionStarted = true;
+                    }
+
+                    if (CursorMode == CursorMode.Interacting && _interactionStarted)
+                        OnValidInteractionPerformed?.Invoke(trnsfrm, collider);
 
                     CursorMode = CursorMode.Interacting;
                     continue;
@@ -241,6 +251,12 @@ namespace GameResources.Gameplay.VRController
 
                 ResetCursorDimensions();
                 CursorMode = CursorMode.Default;
+
+                if (_interactionStarted)
+                {
+                    OnValidInteractionCancelled?.Invoke();
+                    _interactionStarted = false;
+                }
             }
 
             if (_cursorRefreshCoroutine != null)
