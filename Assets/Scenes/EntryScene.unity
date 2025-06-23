@@ -7277,7 +7277,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1501821580}
   m_Layer: 0
-  m_Name: Game Set - Application Phase 2
+  m_Name: Game Set - Application Phase 2 and 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7561,7 +7561,7 @@ GameObject:
   - component: {fileID: 1623276156}
   - component: {fileID: 1623276158}
   m_Layer: 10
-  m_Name: Look Area Generator - Application Phase 1
+  m_Name: Look Area Generator - Application Phase 1, 2, and 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

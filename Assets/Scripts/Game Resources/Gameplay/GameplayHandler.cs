@@ -46,9 +46,9 @@ namespace GameResources.Gameplay
 
         [Space(5)]
         
-        [Header("Game Set - Application Phase 2")]
+        [Header("Game Set - Application Phase 2 and 4")]
         [SerializeField]
-        private GameObject _gameSetPhase2;
+        private GameObject _gameSetPhase2and4;
         [SerializeField]
         private Transform _spawnCenter;
         [SerializeField]
@@ -198,7 +198,7 @@ namespace GameResources.Gameplay
             if (hardRest)
             {
                 _gameSetWarmup.SetActive(false);
-                _gameSetPhase2.SetActive(false);
+                _gameSetPhase2and4.SetActive(false);
                 _gameSetPhase3.SetActive(false);
 
                 foreach (var item in _bezierSplines)
@@ -338,7 +338,7 @@ namespace GameResources.Gameplay
                     ResetGame(false);
 
                     _gameSetWarmup.SetActive(false);
-                    _gameSetPhase2.SetActive(true);
+                    _gameSetPhase2and4.SetActive(true);
                     _lookAreaGenerator.gameObject.SetActive(true);
                     _lookAreaGenerator.AllowLookAreaModification();
 
@@ -365,7 +365,7 @@ namespace GameResources.Gameplay
                     _gameSetPhase3.SetActive(true);
                     _lookAreaGenerator.RestrictLookAreaModification();
                     _lookAreaGenerator.gameObject.SetActive(false);
-                    _gameSetPhase2.SetActive(false);
+                    _gameSetPhase2and4.SetActive(false);
 
                     _interactionPanel_AppP3.InitializePanel();    
 
