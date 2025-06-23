@@ -26,16 +26,29 @@ namespace GameResources.StateMachine
         }
     }
 
-    /// <summary>
-    /// State for starting application 1, 
-    /// automatically closes application 2
-    /// on entry.
-    /// </summary>
-    public class AppState_AppPhase1 : App_State
+    public class AppState_Warmup : App_State
     {
         public override void OnEnter()
         {
             GameplayHandler.OnPlayEvent?.Invoke(1);
+            CursorHandler.Instance.EnableCursorInteraction(false, false);
+        }
+
+        public override void OnExit()
+        {
+            if (NextState != null && NextState.GetType() == typeof(AppState_InitMenu))
+            {
+                GameplayHandler.OnExitEvent?.Invoke();
+                CursorHandler.Instance.DisableCursorInteraction();
+            }
+        }
+    }
+
+    public class AppState_AppPhase1 : App_State
+    {
+        public override void OnEnter()
+        {
+            GameplayHandler.OnPlayEvent?.Invoke(2);
             CursorHandler.Instance.EnableCursorInteraction(true, true);
         }
 
@@ -53,7 +66,7 @@ namespace GameResources.StateMachine
     {
         public override void OnEnter()
         {
-            GameplayHandler.OnPlayEvent?.Invoke(2);
+            GameplayHandler.OnPlayEvent?.Invoke(3);
             CursorHandler.Instance.EnableCursorInteraction();
         }
 
@@ -71,7 +84,7 @@ namespace GameResources.StateMachine
     {
         public override void OnEnter()
         {
-            GameplayHandler.OnPlayEvent?.Invoke(3);
+            GameplayHandler.OnPlayEvent?.Invoke(4);
             CursorHandler.Instance.EnableCursorInteraction(false, false);
         }
 
@@ -89,7 +102,7 @@ namespace GameResources.StateMachine
     {
         public override void OnEnter()
         {
-            GameplayHandler.OnPlayEvent?.Invoke(4);
+            GameplayHandler.OnPlayEvent?.Invoke(5);
             CursorHandler.Instance.EnableCursorInteraction(true, false);
         }
 

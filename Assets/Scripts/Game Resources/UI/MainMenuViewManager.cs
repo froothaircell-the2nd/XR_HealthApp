@@ -34,7 +34,7 @@ namespace GameResources.UI
             if (!App_StateMachineMediator.IsInstantiated)
                 return;
 
-            App_StateMachineMediator.Instance.StartAppPhase1();
+            App_StateMachineMediator.Instance.StartAppWarmup();
         }
 
         private void OnQuitButtonClicked()

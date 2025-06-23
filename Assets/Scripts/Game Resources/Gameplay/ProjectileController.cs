@@ -16,6 +16,8 @@ namespace GameResources.Gameplay
         CenteringReticle = 0,
         Phase2Projectile = 1,   // Projectiles that get shot towards user in phase 2
         Phase3Projectile = 2,   // Projectile that will move on a fixed route in phase 3
+        Phase4Target = 3,
+        WarmupTarget = 4,
     }
 
     public class ProjectileController : PooledItem, ICursorInteractable
@@ -27,7 +29,7 @@ namespace GameResources.Gameplay
 
         [Space(5)]
 
-        [Header("Phase 2 Projectile & Centering Reticle")]
+        [Header("Misc Properties")]
         [SerializeField]
         private float _targetVelocity = 10f;
         [SerializeField, Range(0f, 1f)]
@@ -41,22 +43,27 @@ namespace GameResources.Gameplay
         [SerializeField]
         private LayerMask _validCollisionLayers;
         [SerializeField, ColorUsage(true, true)]
-        private Color _centeringReticleColor, 
-            _phase2ProjectileColor, 
-            _phase3ProjectileColor;
+        private Color _centeringReticleColor,
+            _phase2ProjectileColor,
+            _phase3ProjectileColor,
+            _warmupTargetColor1, _warmupTargetColor2;
+        [SerializeField]
+        TrailRenderer _trailRenderer;
 
         #region Private Properties
         private Material _projectileMaterial;
         private ProjectileMode _currentProjectileMode = ProjectileMode.Phase2Projectile;
         private Vector3 _currentVelocity = Vector3.zero;
-        private bool _isInteractable = false;
-        private bool _centeringReticleContracting = false;
+        private bool _isInteractable = false,
+            _centeringReticleContracting = false,
+            _warmupItemSelected = false;
         private float _originalScale = 1.2f, _finalScale = 0.35f;
 
         private TweenerCore<Vector3, Vector3, VectorOptions> _centeringReticleResizingTween = null;
         #endregion
 
         #region Public Properties
+        public Action OnWarmupTargetSelected = null;
         public Action OnCenteringReticleDespawned = null;
         public Action OnPhase3ProjectileDespawned = null;
 
@@ -117,6 +124,11 @@ namespace GameResources.Gameplay
                     _splineFollower.speed = _followSpeed;
                     _splineFollower.travelMode = TravelMode.Once;
                     _splineFollower.onPathCompleted.AddListener(OnSplinePathComplete);
+
+                    _trailRenderer.enabled = true;
+                    break;
+                case ProjectileMode.WarmupTarget:
+                    _projectileMaterial.SetColor("_EmissionColor", _warmupTargetColor1);
                     break;
             }
         }
@@ -128,9 +140,15 @@ namespace GameResources.Gameplay
             transform.localScale = Vector3.one;
             transform.localScale = Vector3.zero;
             transform.rotation = Quaternion.identity;
+            _trailRenderer.enabled = false;
 
             _isInteractable = false;
             _centeringReticleContracting = false;
+            _warmupItemSelected = false;
+
+            OnWarmupTargetSelected = null;
+            OnCenteringReticleDespawned = null;
+            OnPhase3ProjectileDespawned = null;
 
             if (_currentProjectileMode == ProjectileMode.Phase3Projectile)
             {
@@ -150,6 +168,13 @@ namespace GameResources.Gameplay
                     break;
                 case ProjectileMode.Phase3Projectile:
                     SimulatePhase3Projectile();
+                    break;
+                case ProjectileMode.Phase4Target:
+                    SimulatePhase4Projectile();
+                    break;
+                case ProjectileMode.WarmupTarget:
+                    SimulateWarmupTargets();
+
                     break;
                 default:
                     // SimulatePhase2Projectile();
@@ -206,6 +231,16 @@ namespace GameResources.Gameplay
             }
         }
 
+        private void SimulatePhase4Projectile()
+        {
+
+        }
+
+        private void SimulateWarmupTargets()
+        {
+
+        }
+
         private void DespawnCenteringReticle()
         {
             OnCenteringReticleDespawned?.Invoke();
@@ -230,10 +265,49 @@ namespace GameResources.Gameplay
 
         public void HandleSelectionEnter()
         {
-            if (CurrentProjectileMode == ProjectileMode.Phase2Projectile)
+            switch (CurrentProjectileMode)
             {
-                GameplayHandler.OnPhase2Hit?.Invoke();
-                ReturnToPool();
+                case ProjectileMode.Phase2Projectile:
+                    GameplayHandler.OnPhase2Hit?.Invoke();
+                    ReturnToPool();
+                    break;
+
+            }
+        }
+
+        public void HandleSelectionExit()
+        {
+
+        }
+
+        public void HandleInteractionEnter()
+        {
+            switch (CurrentProjectileMode)
+            {
+                case ProjectileMode.CenteringReticle:
+                    CenteringReticleContracting = true;
+                    break;
+                case ProjectileMode.WarmupTarget:
+                    if (_warmupItemSelected)
+                        return;
+
+                    _projectileMaterial.SetColor("_EmissionColor", _warmupTargetColor2);
+                    _warmupItemSelected = true;
+                    OnWarmupTargetSelected?.Invoke();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        public void HandleInteractionExit()
+        {
+            switch (CurrentProjectileMode)
+            {
+                case ProjectileMode.CenteringReticle:
+                    CenteringReticleContracting = false;
+                    break;
+
             }
         }
 

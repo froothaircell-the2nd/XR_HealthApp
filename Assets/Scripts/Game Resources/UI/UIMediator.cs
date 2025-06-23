@@ -88,13 +88,19 @@ namespace GameResources.UI
             switch (appPhase)
             {
                 case 1:
-                    currView = _viewManagers.FirstOrDefault((elem) => elem.AssignedViewType == UIViewType.AppP1);
+                    currView = _viewManagers.FirstOrDefault((elem) => elem.AssignedViewType == UIViewType.AppWarmup);
                     break;
                 case 2:
-                    currView = _viewManagers.FirstOrDefault((elem) => elem.AssignedViewType == UIViewType.AppP2);
+                    currView = _viewManagers.FirstOrDefault((elem) => elem.AssignedViewType == UIViewType.AppP1);
                     break;
                 case 3:
+                    currView = _viewManagers.FirstOrDefault((elem) => elem.AssignedViewType == UIViewType.AppP2);
+                    break;
+                case 4:
                     currView = _viewManagers.FirstOrDefault((elem) => elem.AssignedViewType == UIViewType.AppP3);
+                    break;
+                case 5:
+                    currView = _viewManagers.FirstOrDefault((elem) => elem.AssignedViewType == UIViewType.AppP4);
                     break;
                 default:
                     break;

@@ -48,12 +48,21 @@ namespace GameResources.StateMachine
         #endregion
 
         #region Public Methods
-        public void StartAppPhase1()
+        public void StartAppWarmup()
         {
             if (!IsInstantiated)
                 return;
 
             if (_fsm.CurrentStateType == typeof(AppState_InitMenu))
+                _fsm.GoToState<AppState_Warmup>();
+        }
+
+        public void StartAppPhase1()
+        {
+            if (!IsInstantiated)
+                return;
+
+            if (_fsm.CurrentStateType == typeof(AppState_Warmup))
                 _fsm.GoToState<AppState_AppPhase1>();
         }
 
@@ -75,6 +84,15 @@ namespace GameResources.StateMachine
                 _fsm.GoToState<AppState_AppPhase3>();
         }
 
+        public void StartAppPhase4()
+        {
+            if (!IsInstantiated)
+                return;
+
+            if (_fsm.CurrentStateType == typeof(AppState_AppPhase3))
+                _fsm.GoToState<AppState_AppPhase4>();
+        }
+
         /// <summary>
         /// Function to be called before 
         /// transitioning to another 
@@ -86,9 +104,11 @@ namespace GameResources.StateMachine
             if (!IsInstantiated)
                 return;
 
-            if (_fsm.CurrentStateType == typeof(AppState_AppPhase1) ||
+            if (_fsm.CurrentStateType == typeof(AppState_Warmup) ||
+                _fsm.CurrentStateType == typeof(AppState_AppPhase1) ||
                 _fsm.CurrentStateType == typeof(AppState_AppPhase2) ||
-                _fsm.CurrentStateType == typeof(AppState_AppPhase3))
+                _fsm.CurrentStateType == typeof(AppState_AppPhase3) ||
+                _fsm.CurrentStateType == typeof(AppState_AppPhase4))
                 _fsm.GoToState<AppState_InitMenu>();
         }
 

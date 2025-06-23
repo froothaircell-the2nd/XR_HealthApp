@@ -4,6 +4,7 @@ using CoreResources.Singleton;
 using CoreResources.Utils;
 using GameResources.Gameplay.VRController;
 using GameResources.Pooling;
+using GameResources.StateMachine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,9 +15,11 @@ namespace GameResources.Gameplay
     public enum AppPhase
     {
         MainMenu = 0,
-        Phase1 = 1,
-        Phase2 = 2,
-        Phase3 = 3,
+        Warmup = 1,
+        Phase1 = 2,
+        Phase2 = 3,
+        Phase3 = 4,
+        Phase4 = 5,
     }
 
     public class GameplayHandler : DestroyableMonoSingleton<GameplayHandler>
@@ -26,6 +29,14 @@ namespace GameResources.Gameplay
         private ObjectPool _pool;
         [SerializeField]
         private PhysiologicalDataHandler _dataHandler;
+
+        [Space(5)]
+        
+        [Header("Game Set - Application Warmup")]
+        [SerializeField]
+        private GameObject _gameSetWarmup;
+        [SerializeField]
+        private Transform[] _defaultTransforms;
 
         [Space(5)]
 
@@ -67,14 +78,15 @@ namespace GameResources.Gameplay
         private Vector3 _defaultSpawnPosition;
         private Quaternion _defaultSpawnRotation;
         private Coroutine _spawnCoroutine;
-        private int _spawnCount;
+        private int _spawnCount, _warmupSelectedCount;
         private bool _triggerPressed,
             _centeringReticleDespawned = false,
             _phase2ProjectileDespawned = false,
             _phase3NextProjectileRequested = false;
         private AppPhase _phase;
 
-        private ProjectileController _cachedProjectile = null;
+        private ProjectileController _cachedProjectile_Interaction = null;
+        private ProjectileController _cachedProjectile_Selection = null;
         #endregion
 
         public AppPhase Phase => _phase;
@@ -87,11 +99,13 @@ namespace GameResources.Gameplay
         /// </summary>
         public static Action<int> OnPlayEvent;
         public static Action OnExitEvent;
+        public static Action OnWarmupComplete;
         public static Action OnPhase2Hit;
         public static Action OnPhase2Complete;
         public static Action OnEnablePhase3NextButton;
         public static Action OnPhase3NextItem;
         public static Action OnPhase3Complete;
+        public static Action OnPhase4Complete;
         #endregion
 
         #region Overrides
@@ -112,11 +126,13 @@ namespace GameResources.Gameplay
         {
             OnPlayEvent = null;
             OnExitEvent = null;
+            OnWarmupComplete = null;
             OnPhase2Hit = null;
             OnPhase2Complete = null;
+            OnEnablePhase3NextButton = null;
             OnPhase3NextItem = null;
             OnPhase3Complete = null;
-            OnEnablePhase3NextButton = null;
+            OnPhase4Complete = null;
 
             _dataHandler.CleanSingleton();
 
@@ -125,6 +141,13 @@ namespace GameResources.Gameplay
         #endregion
 
         #region Private Methods
+        private void InitializeWarmupTarget(PooledItem item)
+        {
+            var res = (ProjectileController)item;
+
+            res.InitializeItem(ProjectileMode.WarmupTarget);
+        }
+
         private void InitializeCenterCursor(PooledItem item)
         {
             var res = (ProjectileController) item;
@@ -156,10 +179,10 @@ namespace GameResources.Gameplay
                 _spawnCoroutine = null;
             }
 
-            if (_cachedProjectile != null)
+            if (_cachedProjectile_Interaction != null)
             {
-                _cachedProjectile.ReturnToPool();
-                _cachedProjectile = null;
+                _cachedProjectile_Interaction.ReturnToPool();
+                _cachedProjectile_Interaction = null;
             }
 
             _phase = 0;
@@ -174,6 +197,7 @@ namespace GameResources.Gameplay
 
             if (hardRest)
             {
+                _gameSetWarmup.SetActive(false);
                 _gameSetPhase2.SetActive(false);
                 _gameSetPhase3.SetActive(false);
 
@@ -190,10 +214,36 @@ namespace GameResources.Gameplay
 
             _pool.CleanPool();
             _spawnCount = 0;
+            _warmupSelectedCount = 0;
+        }
+
+        private IEnumerator SpawnCoroutine_Warmup()
+        {
+            _spawnCount = 0;
+            _warmupSelectedCount = 0;
+
+            int maxCount = _defaultTransforms.Length;
+
+            while (_spawnCount < maxCount)
+            {
+                var currTrnsfrm = _defaultTransforms[_spawnCount];
+
+                ProjectileController item = (ProjectileController) _pool.SpawnItem(currTrnsfrm.position, currTrnsfrm.rotation, InitializeWarmupTarget);
+
+                item.OnWarmupTargetSelected += OnWarmupTargetSelected;
+
+                ++_spawnCount;
+            }
+
+            yield return new WaitUntil(() => _warmupSelectedCount >= maxCount);
+
+            OnWarmupComplete?.Invoke();
         }
 
         private IEnumerator SpawnCoroutine_AppP2()
         {
+            _spawnCount = 0;
+
             while (_spawnCount < _phase2SpawnCount)
             {
                 // var angleRad = UnityEngine.Random.Range(0f, 360f).ToRadians();
@@ -232,6 +282,8 @@ namespace GameResources.Gameplay
 
         private IEnumerator SpawnCoroutine_AppP3()
         {
+            _spawnCount = 0;
+
             while (_spawnCount < _bezierSplines.Length)
             {
                 var currSpline = _bezierSplines[_spawnCount];
@@ -267,6 +319,25 @@ namespace GameResources.Gameplay
             switch (appPhase)
             {
                 case 1:
+                    // Initialization for warmup
+                    _gameSetWarmup.SetActive(true);
+                    _lookAreaGenerator.gameObject.SetActive(false);
+
+                    if (_spawnCoroutine != null)
+                    {
+                        StopCoroutine(_spawnCoroutine);
+                        _spawnCoroutine = null;
+                    }
+
+                    _pool.UnlockPool();
+                    _spawnCoroutine = StartCoroutine(SpawnCoroutine_Warmup());
+
+                    _phase = (AppPhase)appPhase;
+                    break;
+                case 2:
+                    ResetGame(false);
+
+                    _gameSetWarmup.SetActive(false);
                     _gameSetPhase2.SetActive(true);
                     _lookAreaGenerator.gameObject.SetActive(true);
                     _lookAreaGenerator.AllowLookAreaModification();
@@ -279,7 +350,7 @@ namespace GameResources.Gameplay
 
                     _phase = (AppPhase)appPhase;
                     break;
-                case 2:
+                case 3:
                     _lookAreaGenerator.RestrictLookAreaModification();
 
                     _phase2ProjectileDespawned = false;
@@ -290,7 +361,7 @@ namespace GameResources.Gameplay
 
                     _phase = (AppPhase)appPhase;
                     break;
-                case 3:
+                case 4:
                     _gameSetPhase3.SetActive(true);
                     _lookAreaGenerator.RestrictLookAreaModification();
                     _lookAreaGenerator.gameObject.SetActive(false);
@@ -310,6 +381,9 @@ namespace GameResources.Gameplay
 
                     _phase = (AppPhase)appPhase;
                     break;
+                case 5:
+                    // Initialization for proprioception test
+                    break;
                 default:
                     break;
             }
@@ -325,6 +399,12 @@ namespace GameResources.Gameplay
             }
 
             ResetGame();
+        }
+
+        private void OnWarmupTargetSelected()
+        {
+            ++_warmupSelectedCount;
+            // Debug.LogError($"Warmup Count incremented. Current Count: {_warmupSelectedCount}");
         }
 
         private void OnHitPerformed_AppP2()
@@ -359,16 +439,23 @@ namespace GameResources.Gameplay
         {
             var currProj = transform.GetComponent<ProjectileController>();
 
-            if (_cachedProjectile != null && _cachedProjectile != currProj)
+            if (_cachedProjectile_Interaction != null && _cachedProjectile_Interaction != currProj)
             {
-                _cachedProjectile.CenteringReticleContracting = false;
+                _cachedProjectile_Interaction.HandleInteractionExit();
             }
 
-            _cachedProjectile = currProj;
-            
-            if (_cachedProjectile != null && !_centeringReticleDespawned)
+            _cachedProjectile_Interaction = currProj;
+
+            if (_cachedProjectile_Interaction == null)
+                return;
+
+            if ((Phase == AppPhase.Phase2 || Phase == AppPhase.Phase4) && !_centeringReticleDespawned)
             {
-                _cachedProjectile.CenteringReticleContracting = true;
+                _cachedProjectile_Interaction.HandleInteractionEnter();
+            }
+            else if (Phase == AppPhase.Warmup) 
+            {
+                _cachedProjectile_Interaction.HandleInteractionEnter();
             }
         }
 
@@ -382,9 +469,9 @@ namespace GameResources.Gameplay
         {
             // var currProjectile = transform.GetComponent<ProjectileController>();
 
-            if (_cachedProjectile != null && !_centeringReticleDespawned)
+            if (_cachedProjectile_Interaction != null && !_centeringReticleDespawned)
             {
-                _cachedProjectile.CenteringReticleContracting = false;
+                _cachedProjectile_Interaction.CenteringReticleContracting = false;
             }
         }
         #endregion

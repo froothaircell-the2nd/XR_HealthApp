@@ -236,7 +236,7 @@ namespace GameResources.Gameplay.VRController
                     // In interaction state
                     ResetCursorDimensions();
 
-                    if ((CursorMode & (CursorMode.Selected | CursorMode.Interacting)) == 0)
+                    if (CursorMode == CursorMode.Selected || CursorMode == CursorMode.Interacting)
                     {
                         OnValidInteractionStarted?.Invoke(trnsfrm, collider);
                         _interactionStarted = true;
