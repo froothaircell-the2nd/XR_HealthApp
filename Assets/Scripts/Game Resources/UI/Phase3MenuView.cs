@@ -7,18 +7,19 @@ using UnityEngine.UI;
 
 namespace GameResources.UI
 {
-    public class Phase2MenuView : UIView<Phase2MenuView>
+    public class Phase3MenuView : UIView<Phase3MenuView>
     {
-        public TMP_Text ScoreText;
         public Button ExitButton;
-        public Button ContinueButton;
+        public Button NextButton;
 
         public override void InitializeViewElements()
         {
+
         }
 
         public override void DeInitializeViewElements()
         {
+
         }
     }
 }

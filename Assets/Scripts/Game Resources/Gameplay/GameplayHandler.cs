@@ -84,6 +84,11 @@ namespace GameResources.Gameplay
         public static Action<int> OnPlayEvent;
         public static Action OnExitEvent;
         public static Action OnPhase2Hit;
+        public static Action OnPhase2Complete;
+        public static Action OnPhase3NextItem;
+        public static Action OnPhase3Complete;
+
+        public Action OnEnablePhase3NextButton;
         #endregion
 
         #region Overrides
@@ -96,7 +101,8 @@ namespace GameResources.Gameplay
 
             OnPlayEvent += OnPlay;
             OnExitEvent += OnExit;
-            OnPhase2Hit += OnPhase2HitPerformed;
+            OnPhase2Hit += OnHitPerformed_AppP2;
+            OnPhase3NextItem += OnNextProjectileRequested_AppP3;
         }
 
         public override void OnDeInit()
@@ -104,6 +110,10 @@ namespace GameResources.Gameplay
             OnPlayEvent = null;
             OnExitEvent = null;
             OnPhase2Hit = null;
+            OnPhase2Complete = null;
+            OnPhase3NextItem = null;
+            OnPhase3Complete = null;
+            OnEnablePhase3NextButton = null;
 
             _dataHandler.CleanSingleton();
 
@@ -112,67 +122,6 @@ namespace GameResources.Gameplay
         #endregion
 
         #region Private Methods
-        private void OnPlay(int appPhase)
-        {
-            if (CursorHandler.IsInstantiated)
-            {
-                CursorHandler.Instance.OnValidSelection += OnValidSelection;
-                CursorHandler.Instance.OnValidCancellation += OnValidSelectionCancelled;
-                CursorHandler.Instance.OnValidInteractionStarted += OnValidInteractionStarted;
-                CursorHandler.Instance.OnValidInteractionPerformed += OnValidInteractionPerformed;
-                CursorHandler.Instance.OnValidInteractionCancelled += OnValidInteractionCancelled;
-            }
-
-            switch (appPhase)
-            {
-                case 1:
-                    _gameSetPhase2.SetActive(true);
-                    _lookAreaGenerator.gameObject.SetActive(true);
-                    _lookAreaGenerator.AllowLookAreaModification();
-
-                    if (_spawnCoroutine != null)
-                    {
-                        StopCoroutine(_spawnCoroutine);
-                        _spawnCoroutine = null;
-                    }
-
-                    _phase = (AppPhase) appPhase;
-                    break;
-                case 2:
-                    _lookAreaGenerator.RestrictLookAreaModification();
-
-                    _phase2ProjectileDespawned = false;
-                    _centeringReticleDespawned = false;
-
-                    _pool.UnlockPool();
-                    _spawnCoroutine = StartCoroutine(SpawnCoroutine_AppP2());
-
-                    _phase = (AppPhase)appPhase;
-                    break;
-                case 3:
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        private void OnExit()
-        {
-            if (CursorHandler.IsInstantiated)
-            {
-                CursorHandler.Instance.OnValidSelection -= OnValidSelection;
-                CursorHandler.Instance.OnValidCancellation -= OnValidSelectionCancelled;
-                CursorHandler.Instance.OnValidInteractionPerformed -= OnValidInteractionPerformed;
-            }
-
-            ResetGame();
-        }
-
-        private void OnPhase2HitPerformed()
-        {
-            _phase2ProjectileDespawned = true;
-        }
-
         private void InitializeCenterCursor(PooledItem item)
         {
             var res = (ProjectileController) item;
@@ -263,6 +212,8 @@ namespace GameResources.Gameplay
             }
 
             ResetGame();
+
+            OnPhase2Complete?.Invoke();
         }
 
         private IEnumerator SpawnCoroutine_AppP3()
@@ -280,10 +231,91 @@ namespace GameResources.Gameplay
             }
 
             ResetGame();
+
+            OnPhase3Complete?.Invoke();
         }
         #endregion
 
         #region Event Listeners
+        private void OnPlay(int appPhase)
+        {
+            if (CursorHandler.IsInstantiated)
+            {
+                CursorHandler.Instance.OnValidSelection += OnValidSelection;
+                CursorHandler.Instance.OnValidCancellation += OnValidSelectionCancelled;
+                CursorHandler.Instance.OnValidInteractionStarted += OnValidInteractionStarted;
+                CursorHandler.Instance.OnValidInteractionPerformed += OnValidInteractionPerformed;
+                CursorHandler.Instance.OnValidInteractionCancelled += OnValidInteractionCancelled;
+            }
+
+            switch (appPhase)
+            {
+                case 1:
+                    _gameSetPhase2.SetActive(true);
+                    _lookAreaGenerator.gameObject.SetActive(true);
+                    _lookAreaGenerator.AllowLookAreaModification();
+
+                    if (_spawnCoroutine != null)
+                    {
+                        StopCoroutine(_spawnCoroutine);
+                        _spawnCoroutine = null;
+                    }
+
+                    _phase = (AppPhase)appPhase;
+                    break;
+                case 2:
+                    _lookAreaGenerator.RestrictLookAreaModification();
+
+                    _phase2ProjectileDespawned = false;
+                    _centeringReticleDespawned = false;
+
+                    _pool.UnlockPool();
+                    _spawnCoroutine = StartCoroutine(SpawnCoroutine_AppP2());
+
+                    _phase = (AppPhase)appPhase;
+                    break;
+                case 3:
+                    _lookAreaGenerator.RestrictLookAreaModification();
+
+                    _pool.UnlockPool();
+
+                    if (_spawnCoroutine != null)
+                    {
+                        StopCoroutine(_spawnCoroutine);
+                        _spawnCoroutine = null;
+                    }
+
+                    _spawnCoroutine = StartCoroutine(SpawnCoroutine_AppP3());
+
+                    _phase = (AppPhase)appPhase;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void OnExit()
+        {
+            if (CursorHandler.IsInstantiated)
+            {
+                CursorHandler.Instance.OnValidSelection -= OnValidSelection;
+                CursorHandler.Instance.OnValidCancellation -= OnValidSelectionCancelled;
+                CursorHandler.Instance.OnValidInteractionPerformed -= OnValidInteractionPerformed;
+            }
+
+            ResetGame();
+        }
+
+        private void OnHitPerformed_AppP2()
+        {
+            _phase2ProjectileDespawned = true;
+        }
+
+        private void OnNextProjectileRequested_AppP3()
+        {
+            _phase3NextProjectileRequested = true;
+        }
+
         private void OnValidSelection(Transform objTransform, Collider objCollider)
         {
             if (!_triggerPressed && (_collisionLayerMask.value & (1 << objCollider.gameObject.layer)) > 0)
@@ -333,11 +365,6 @@ namespace GameResources.Gameplay
             {
                 _cachedProjectile.CenteringReticleContracting = false;
             }
-        }
-
-        private void OnNextProjectileRequested_AppP3()
-        {
-            _phase3NextProjectileRequested = true;
         }
         #endregion
     }

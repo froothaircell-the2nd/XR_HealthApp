@@ -58,6 +58,7 @@ namespace GameResources.Gameplay
 
         #region Public Properties
         public Action OnCenteringReticleDespawned = null;
+        public Action OnPhase3ProjectileDespawned = null;
 
         public bool IsInteractable
         {
@@ -215,6 +216,7 @@ namespace GameResources.Gameplay
 
         private void OnSplinePathComplete()
         {
+            GameplayHandler.Instance.OnEnablePhase3NextButton?.Invoke();
             ReturnToPool();
         }
         #endregion
@@ -239,6 +241,8 @@ namespace GameResources.Gameplay
         {
             if (_splineFollower != null)
                 _splineFollower.spline = spline;
+
+            transform.position = spline[0].position;
         }
         #endregion
     }

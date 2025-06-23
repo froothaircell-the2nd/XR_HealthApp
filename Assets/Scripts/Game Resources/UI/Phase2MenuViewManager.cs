@@ -6,19 +6,37 @@ namespace GameResources.UI
 {
     public class Phase2MenuViewManager : UIViewManager<Phase2MenuViewManager, Phase2MenuView>
     {
+        #region Overrides
         protected override void OnInitialize()
         {
             view.ExitButton.onClick.AddListener(OnExitButtonClicked);
+            view.ContinueButton.onClick.AddListener(OnContinueButtonClicked);
 
             PhysiologicalDataHandler.OnScoreUpdated += OnScoreUpdated;
+            GameplayHandler.OnPhase2Complete += OnContinueButtonEnabled;
         }
 
         protected override void OnDeInitialize()
         {
             PhysiologicalDataHandler.OnScoreUpdated -= OnScoreUpdated;
+            GameplayHandler.OnPhase2Complete -= OnContinueButtonEnabled;
 
             view.ExitButton.onClick.RemoveAllListeners();
+            view.ContinueButton.onClick.RemoveAllListeners();
         }
+
+        public override void OnShowPanel()
+        {
+            base.OnShowPanel();
+
+            view.ContinueButton.interactable = false;
+        }
+
+        public override void OnHidePanel()
+        {
+            base.OnHidePanel();
+        }
+        #endregion
 
         private void OnExitButtonClicked()
         {
@@ -28,11 +46,22 @@ namespace GameResources.UI
             App_StateMachineMediator.Instance.QuitCurrentAppPhase();
         }
 
+        private void OnContinueButtonEnabled()
+        {
+            view.ContinueButton.interactable = true;
+        }
+
+        private void OnContinueButtonClicked()
+        {
+            if (!App_StateMachineMediator.IsInstantiated)
+                return;
+
+            App_StateMachineMediator.Instance.StartAppPhase3();
+        }
+
         private void OnScoreUpdated(int score)
         {
-            var maxScore = PhysiologicalDataHandler.Instance.MaxScore;
-
-            view.ScoreText.text = $"Score: {score} / {maxScore}";
+            view.ScoreText.text = $"Score: {score}";
         }
     }
 }
