@@ -142,7 +142,7 @@ namespace GameResources.Gameplay.VRController
         {
             _interactionEnabled = true;
             _selectionEnabled = enableCursorSelection;
-            _selectionSpriteModificationEnabled = enableCursorSelection;
+            _selectionSpriteModificationEnabled = enableCursorModification;
 
             if (_cursorRefreshCoroutine != null)
             {

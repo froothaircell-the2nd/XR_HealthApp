@@ -72,7 +72,25 @@ namespace GameResources.StateMachine
         public override void OnEnter()
         {
             GameplayHandler.OnPlayEvent?.Invoke(3);
-            CursorHandler.Instance.EnableCursorInteraction(true, true);
+            CursorHandler.Instance.EnableCursorInteraction(false, false);
+        }
+
+        public override void OnExit()
+        {
+            if (NextState != null && NextState.GetType() == typeof(AppState_InitMenu))
+            {
+                GameplayHandler.OnExitEvent?.Invoke();
+                CursorHandler.Instance.DisableCursorInteraction();
+            }
+        }
+    }
+
+    public class AppState_AppPhase4 : App_State
+    {
+        public override void OnEnter()
+        {
+            GameplayHandler.OnPlayEvent?.Invoke(4);
+            CursorHandler.Instance.EnableCursorInteraction(true, false);
         }
 
         public override void OnExit()

@@ -55,7 +55,11 @@ namespace GameResources.Gameplay
 
         [Header("Game Set - Application Phase 3")]
         [SerializeField]
+        private GameObject _gameSetPhase3;
+        [SerializeField]
         private BezierSpline[] _bezierSplines;
+        [SerializeField]
+        private InteractionPanel _interactionPanel_AppP3;
 
         #endregion
 
@@ -85,10 +89,9 @@ namespace GameResources.Gameplay
         public static Action OnExitEvent;
         public static Action OnPhase2Hit;
         public static Action OnPhase2Complete;
+        public static Action OnEnablePhase3NextButton;
         public static Action OnPhase3NextItem;
         public static Action OnPhase3Complete;
-
-        public Action OnEnablePhase3NextButton;
         #endregion
 
         #region Overrides
@@ -145,7 +148,7 @@ namespace GameResources.Gameplay
             res.InjectSpline(spline);
         }
 
-        private void ResetGame()
+        private void ResetGame(bool hardRest = true)
         {
             if (_spawnCoroutine != null)
             {
@@ -167,12 +170,23 @@ namespace GameResources.Gameplay
             _spawnCenter.localPosition = _defaultSpawnPosition;
             _spawnCenter.rotation = _defaultSpawnRotation;
 
-            _gameSetPhase2.SetActive(false);
+            _interactionPanel_AppP3.DeInitializePanel();
 
-            _lookAreaGenerator.RestrictLookAreaModification();
-            _lookAreaGenerator.gameObject.SetActive(false);
+            if (hardRest)
+            {
+                _gameSetPhase2.SetActive(false);
+                _gameSetPhase3.SetActive(false);
 
-            _dataHandler.ResetMetrics();
+                foreach (var item in _bezierSplines)
+                {
+                    item.gameObject.SetActive(false);
+                }
+
+                _lookAreaGenerator.RestrictLookAreaModification();
+                _lookAreaGenerator.gameObject.SetActive(false);
+
+                _dataHandler.ResetMetrics();
+            }
 
             _pool.CleanPool();
             _spawnCount = 0;
@@ -180,7 +194,7 @@ namespace GameResources.Gameplay
 
         private IEnumerator SpawnCoroutine_AppP2()
         {
-            while (_spawnCount <= _phase2SpawnCount)
+            while (_spawnCount < _phase2SpawnCount)
             {
                 // var angleRad = UnityEngine.Random.Range(0f, 360f).ToRadians();
                 // var radius = UnityEngine.Random.Range(_minSpawnRadius2, _maxSpawnRadius2);
@@ -211,7 +225,7 @@ namespace GameResources.Gameplay
                 _phase2ProjectileDespawned = false;
             }
 
-            ResetGame();
+            ResetGame(false);
 
             OnPhase2Complete?.Invoke();
         }
@@ -221,16 +235,18 @@ namespace GameResources.Gameplay
             while (_spawnCount < _bezierSplines.Length)
             {
                 var currSpline = _bezierSplines[_spawnCount];
+                currSpline.gameObject.SetActive(true);
 
                 _pool.SpawnItem(_spawnCenter.position, _spawnCenter.rotation, (item) => { InitializePhase3Projectile(item, currSpline); });
                 ++_spawnCount;
 
                 yield return new WaitUntil(() => _phase3NextProjectileRequested);
 
+                currSpline.gameObject.SetActive(false);
                 _phase3NextProjectileRequested = false;
             }
 
-            ResetGame();
+            ResetGame(false);
 
             OnPhase3Complete?.Invoke();
         }
@@ -275,7 +291,12 @@ namespace GameResources.Gameplay
                     _phase = (AppPhase)appPhase;
                     break;
                 case 3:
+                    _gameSetPhase3.SetActive(true);
                     _lookAreaGenerator.RestrictLookAreaModification();
+                    _lookAreaGenerator.gameObject.SetActive(false);
+                    _gameSetPhase2.SetActive(false);
+
+                    _interactionPanel_AppP3.InitializePanel();    
 
                     _pool.UnlockPool();
 

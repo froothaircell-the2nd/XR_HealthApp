@@ -13,7 +13,7 @@ namespace GameResources.UI
             view.ExitButton.onClick.AddListener(OnExitButtonClicked);
             view.NextButton.onClick.AddListener(OnNextButtonClicked);
 
-            GameplayHandler.Instance.OnEnablePhase3NextButton += OnEnableNextButton;
+            GameplayHandler.OnEnablePhase3NextButton += OnEnableNextButton;
         }
 
         protected override void OnDeInitialize()
@@ -22,7 +22,7 @@ namespace GameResources.UI
             view.NextButton.onClick.RemoveAllListeners();
 
             if (GameplayHandler.IsInstantiated)
-                GameplayHandler.Instance.OnEnablePhase3NextButton -= OnEnableNextButton;
+                GameplayHandler.OnEnablePhase3NextButton -= OnEnableNextButton;
         }
 
         public override void OnShowPanel()

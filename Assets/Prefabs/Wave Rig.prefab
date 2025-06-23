@@ -4370,7 +4370,7 @@ MonoBehaviour:
   _canvasDistance: 2
   _targetLayer:
     serializedVersion: 2
-    m_Bits: 640
+    m_Bits: 2688
   _paddingMultiplier: 4.5
   _maxRaycastRange: 200
   _spherecastRadius: 0.2

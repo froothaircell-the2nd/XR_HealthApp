@@ -94,6 +94,7 @@ namespace GameResources.UI
                     currView = _viewManagers.FirstOrDefault((elem) => elem.AssignedViewType == UIViewType.AppP2);
                     break;
                 case 3:
+                    currView = _viewManagers.FirstOrDefault((elem) => elem.AssignedViewType == UIViewType.AppP3);
                     break;
                 default:
                     break;

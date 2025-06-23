@@ -216,7 +216,7 @@ namespace GameResources.Gameplay
 
         private void OnSplinePathComplete()
         {
-            GameplayHandler.Instance.OnEnablePhase3NextButton?.Invoke();
+            GameplayHandler.OnEnablePhase3NextButton?.Invoke();
             ReturnToPool();
         }
         #endregion
@@ -242,7 +242,8 @@ namespace GameResources.Gameplay
             if (_splineFollower != null)
                 _splineFollower.spline = spline;
 
-            transform.position = spline[0].position;
+            _splineFollower.NormalizedT = 0;
+            // transform.position = spline[0].position;
         }
         #endregion
     }

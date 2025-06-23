@@ -23,7 +23,10 @@ namespace GameResources.Gameplay
             ResetMetrics();
 
             GameplayHandler.OnPhase2Hit += IncrementScore;
+            GameplayHandler.OnPlayEvent += SetCurrentMeasurementMode;
+            GameplayHandler.OnExitEvent += ResetCurrentMeasurementMode;
         }
+
 
         public override void CleanSingleton()
         {
@@ -32,8 +35,15 @@ namespace GameResources.Gameplay
             OnScoreUpdated = null;
             
             GameplayHandler.OnPhase2Hit -= IncrementScore;
+            GameplayHandler.OnPlayEvent -= SetCurrentMeasurementMode;
+            GameplayHandler.OnExitEvent -= ResetCurrentMeasurementMode;
 
             base.CleanSingleton();
+        }
+
+        private void FixedUpdate()
+        {
+            ProcessMetrics();
         }
         #endregion
 
@@ -47,6 +57,13 @@ namespace GameResources.Gameplay
         }
         #endregion
 
+        #region Private Methods
+        private void ProcessMetrics()
+        {
+
+        }
+        #endregion
+
         #region Event Listeners
         private void IncrementScore()
         {
@@ -54,6 +71,15 @@ namespace GameResources.Gameplay
 
             if (GameplayHandler.Instance.Phase >= (AppPhase) 1)
                 OnScoreUpdated?.Invoke(_score);
+        }
+
+        private void SetCurrentMeasurementMode(int currMode)
+        {
+            
+        }
+
+        private void ResetCurrentMeasurementMode()
+        {
         }
         #endregion
     }

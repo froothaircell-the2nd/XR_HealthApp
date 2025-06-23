@@ -12,11 +12,11 @@ TagManager:
   - Water
   - UI
   - ProjectileBounds
-  - Target_Projectile
+  - Projectile_Interactable
   - User
   - Spawn_Interactable
   - Spawn_InteractionPlane
-  - 
+  - Panel_Interactable
   - 
   - 
   - 
