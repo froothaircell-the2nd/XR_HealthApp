@@ -1,3 +1,4 @@
+using BezierSolution;
 using CoreResources.Managers.InputManagement;
 using CoreResources.Singleton;
 using CoreResources.Utils;
@@ -28,28 +29,34 @@ namespace GameResources.Gameplay
 
         [Space(5)]
 
-        [Header("Game Set")]
-        [SerializeField]
-        private GameObject _gameSet;
-        [SerializeField]
-        private Transform _spawnCenter;
+        [Header("Game Set - Application Phase 1")]
         [SerializeField]
         private LookAreaGenerator _lookAreaGenerator;
+
+        [Space(5)]
+        
+        [Header("Game Set - Application Phase 2")]
+        [SerializeField]
+        private GameObject _gameSetPhase2;
+        [SerializeField]
+        private Transform _spawnCenter;
         [SerializeField]
         private float _minSpawnDelay = 0.8f, 
         _maxSpawnDelay = 5f,
         _maxSpawnDistance = 10f;
-
-        [Space(5)]
-
         [SerializeField]
         private LayerMask _collisionLayerMask;
-        [SerializeField]
-        private float _maxRaycastDistance = 50;
         [SerializeField]
         private int _phase2SpawnCount = 15;
         [SerializeField]
         private Transform _camHMD;
+
+        [Space(5)]
+
+        [Header("Game Set - Application Phase 3")]
+        [SerializeField]
+        private BezierSpline[] _bezierSplines;
+
         #endregion
 
         #region Private Fields
@@ -59,7 +66,8 @@ namespace GameResources.Gameplay
         private int _spawnCount;
         private bool _triggerPressed,
             _centeringReticleDespawned = false,
-            _phase2ProjectileDespawned = false;
+            _phase2ProjectileDespawned = false,
+            _phase3NextProjectileRequested = false;
         private AppPhase _phase;
 
         private ProjectileController _cachedProjectile = null;
@@ -118,7 +126,7 @@ namespace GameResources.Gameplay
             switch (appPhase)
             {
                 case 1:
-                    _gameSet.SetActive(true);
+                    _gameSetPhase2.SetActive(true);
                     _lookAreaGenerator.gameObject.SetActive(true);
                     _lookAreaGenerator.AllowLookAreaModification();
 
@@ -137,7 +145,7 @@ namespace GameResources.Gameplay
                     _centeringReticleDespawned = false;
 
                     _pool.UnlockPool();
-                    _spawnCoroutine = StartCoroutine(SpawnCoroutine_AppP1());
+                    _spawnCoroutine = StartCoroutine(SpawnCoroutine_AppP2());
 
                     _phase = (AppPhase)appPhase;
                     break;
@@ -180,11 +188,12 @@ namespace GameResources.Gameplay
             res.InitializeItem(ProjectileMode.Phase2Projectile);
         }
 
-        private void InitializePhase3Projectile(PooledItem item)
+        private void InitializePhase3Projectile(PooledItem item, BezierSpline spline)
         {
             var res = (ProjectileController) item;
 
             res.InitializeItem(ProjectileMode.Phase3Projectile);
+            res.InjectSpline(spline);
         }
 
         private void ResetGame()
@@ -209,7 +218,7 @@ namespace GameResources.Gameplay
             _spawnCenter.localPosition = _defaultSpawnPosition;
             _spawnCenter.rotation = _defaultSpawnRotation;
 
-            _gameSet.SetActive(false);
+            _gameSetPhase2.SetActive(false);
 
             _lookAreaGenerator.RestrictLookAreaModification();
             _lookAreaGenerator.gameObject.SetActive(false);
@@ -220,7 +229,7 @@ namespace GameResources.Gameplay
             _spawnCount = 0;
         }
 
-        private IEnumerator SpawnCoroutine_AppP1()
+        private IEnumerator SpawnCoroutine_AppP2()
         {
             while (_spawnCount <= _phase2SpawnCount)
             {
@@ -251,6 +260,23 @@ namespace GameResources.Gameplay
                 yield return new WaitUntil(() => _phase2ProjectileDespawned);
 
                 _phase2ProjectileDespawned = false;
+            }
+
+            ResetGame();
+        }
+
+        private IEnumerator SpawnCoroutine_AppP3()
+        {
+            while (_spawnCount < _bezierSplines.Length)
+            {
+                var currSpline = _bezierSplines[_spawnCount];
+
+                _pool.SpawnItem(_spawnCenter.position, _spawnCenter.rotation, (item) => { InitializePhase3Projectile(item, currSpline); });
+                ++_spawnCount;
+
+                yield return new WaitUntil(() => _phase3NextProjectileRequested);
+
+                _phase3NextProjectileRequested = false;
             }
 
             ResetGame();
@@ -307,6 +333,11 @@ namespace GameResources.Gameplay
             {
                 _cachedProjectile.CenteringReticleContracting = false;
             }
+        }
+
+        private void OnNextProjectileRequested_AppP3()
+        {
+            _phase3NextProjectileRequested = true;
         }
         #endregion
     }

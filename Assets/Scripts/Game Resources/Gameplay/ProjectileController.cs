@@ -1,3 +1,4 @@
+using BezierSolution;
 using DG.Tweening;
 using DG.Tweening.Core;
 using DG.Tweening.Plugins.Options;
@@ -19,6 +20,14 @@ namespace GameResources.Gameplay
 
     public class ProjectileController : PooledItem, ICursorInteractable
     {
+        [Header("Spline Follow")]
+        [SerializeField]
+        private BezierWalkerWithSpeed _splineFollower;
+        private float _followSpeed = 1.9f;
+
+        [Space(5)]
+
+        [Header("Phase 2 Projectile & Centering Reticle")]
         [SerializeField]
         private float _targetVelocity = 10f;
         [SerializeField, Range(0f, 1f)]
@@ -100,6 +109,13 @@ namespace GameResources.Gameplay
                     break;
                 case ProjectileMode.Phase3Projectile:
                     _projectileMaterial.SetColor("_EmissionColor", _phase3ProjectileColor);
+                    if (_splineFollower == null)
+                        _splineFollower = transform.GetComponent<BezierWalkerWithSpeed>();
+
+                    _splineFollower.enabled = true;
+                    _splineFollower.speed = _followSpeed;
+                    _splineFollower.travelMode = TravelMode.Once;
+                    _splineFollower.onPathCompleted.AddListener(OnSplinePathComplete);
                     break;
             }
         }
@@ -114,6 +130,11 @@ namespace GameResources.Gameplay
 
             _isInteractable = false;
             _centeringReticleContracting = false;
+
+            if (_currentProjectileMode == ProjectileMode.Phase3Projectile)
+            {
+                _splineFollower.onPathCompleted.RemoveAllListeners();
+            }
         }
 
         private void Update()
@@ -178,7 +199,10 @@ namespace GameResources.Gameplay
 
         private void SimulatePhase3Projectile()
         {
-
+            if (!IsPooled)
+            {
+                _splineFollower.Execute(Time.deltaTime);
+            }
         }
 
         private void DespawnCenteringReticle()
@@ -186,6 +210,11 @@ namespace GameResources.Gameplay
             OnCenteringReticleDespawned?.Invoke();
             OnCenteringReticleDespawned = null;
 
+            ReturnToPool();
+        }
+
+        private void OnSplinePathComplete()
+        {
             ReturnToPool();
         }
         #endregion
@@ -204,6 +233,12 @@ namespace GameResources.Gameplay
                 GameplayHandler.OnPhase2Hit?.Invoke();
                 ReturnToPool();
             }
+        }
+
+        public void InjectSpline(BezierSpline spline)
+        {
+            if (_splineFollower != null)
+                _splineFollower.spline = spline;
         }
         #endregion
     }

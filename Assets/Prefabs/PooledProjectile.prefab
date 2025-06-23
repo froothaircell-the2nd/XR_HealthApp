@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 9058433431093239422}
   - component: {fileID: 6381193690023294858}
   - component: {fileID: 7899130196724698355}
+  - component: {fileID: -8621245114143319834}
   m_Layer: 7
   m_Name: PooledProjectile
   m_TagString: Untagged
@@ -146,6 +147,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 966589a509b19514fa92a31b223f8b54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _splineFollower: {fileID: -8621245114143319834}
   _targetVelocity: 5
   _velocityBlendStrength: 0.16
   _centeringReticleResizingDuration: 5
@@ -154,6 +156,27 @@ MonoBehaviour:
   _validCollisionLayers:
     serializedVersion: 2
     m_Bits: 64
-  _centeringReticleColor: {r: 11.984314, g: 0.50954455, b: 0, a: 1}
-  _phase2ProjectileColor: {r: 0, g: 3.8170047, b: 11.984314, a: 1}
-  _phase3ProjectileColor: {r: 0.16362232, g: 11.984314, b: 0, a: 1}
+  _centeringReticleColor: {r: 2.9960785, g: 0.12738614, b: 0, a: 1}
+  _phase2ProjectileColor: {r: 0, g: 0.60258794, b: 1.886792, a: 1}
+  _phase3ProjectileColor: {r: 0.069386266, g: 2.9960785, b: 0, a: 1}
+--- !u!114 &-8621245114143319834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3638476001040999290}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 148310ac13c958d4c93f53cdfe985375, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spline: {fileID: 0}
+  travelMode: 0
+  speed: 1.9
+  m_normalizedT: 0
+  rotationLerpModifier: 10
+  lookAt: 1
+  onPathCompleted:
+    m_PersistentCalls:
+      m_Calls: []
