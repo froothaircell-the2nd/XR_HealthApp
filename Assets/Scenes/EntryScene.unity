@@ -5087,7 +5087,7 @@ MonoBehaviour:
   - {fileID: 1775212558}
   - {fileID: 191060339}
   _lookAreaGenerator: {fileID: 1623276158}
-  _gameSetPhase2: {fileID: 1501821579}
+  _gameSetPhase2and4: {fileID: 1501821579}
   _spawnCenter: {fileID: 442297610}
   _minSpawnDelay: 2
   _maxSpawnDelay: 8
