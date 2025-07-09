@@ -289,6 +289,7 @@ namespace GameResources.Gameplay
                 var currSpline = _bezierSplines[_spawnCount];
                 currSpline.gameObject.SetActive(true);
 
+                _spawnCenter.position = currSpline.GetPoint(0);
                 _pool.SpawnItem(_spawnCenter.position, _spawnCenter.rotation, (item) => { InitializePhase3Projectile(item, currSpline); });
                 ++_spawnCount;
 
@@ -449,7 +450,7 @@ namespace GameResources.Gameplay
             if (_cachedProjectile_Interaction == null)
                 return;
 
-            if ((Phase == AppPhase.Phase2 || Phase == AppPhase.Phase4) && !_centeringReticleDespawned)
+            if ((Phase == AppPhase.Phase2 || Phase == AppPhase.Phase3 || Phase == AppPhase.Phase4) && !_centeringReticleDespawned)
             {
                 _cachedProjectile_Interaction.HandleInteractionEnter();
             }

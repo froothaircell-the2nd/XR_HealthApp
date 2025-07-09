@@ -56,10 +56,12 @@ namespace GameResources.Gameplay
         private Vector3 _currentVelocity = Vector3.zero;
         private bool _isInteractable = false,
             _centeringReticleContracting = false,
-            _warmupItemSelected = false;
+            _warmupItemSelected = false,
+            _phase3startPath = false;
         private float _originalScale = 1.2f, _finalScale = 0.35f;
 
         private TweenerCore<Vector3, Vector3, VectorOptions> _centeringReticleResizingTween = null;
+        private Coroutine _phase3AwaitCoroutine = null;
         #endregion
 
         #region Public Properties
@@ -120,12 +122,20 @@ namespace GameResources.Gameplay
                     if (_splineFollower == null)
                         _splineFollower = transform.GetComponent<BezierWalkerWithSpeed>();
 
+                    _phase3startPath = false;
                     _splineFollower.enabled = true;
                     _splineFollower.speed = _followSpeed;
                     _splineFollower.travelMode = TravelMode.Once;
                     _splineFollower.onPathCompleted.AddListener(OnSplinePathComplete);
 
                     _trailRenderer.enabled = true;
+
+                    if (_phase3AwaitCoroutine != null)
+                    {
+                        StopCoroutine(_phase3AwaitCoroutine);
+                        _phase3AwaitCoroutine = null;
+                    }
+
                     break;
                 case ProjectileMode.WarmupTarget:
                     _projectileMaterial.SetColor("_EmissionColor", _warmupTargetColor1);
@@ -153,6 +163,12 @@ namespace GameResources.Gameplay
             if (_currentProjectileMode == ProjectileMode.Phase3Projectile)
             {
                 _splineFollower.onPathCompleted.RemoveAllListeners();
+            }
+
+            if (_phase3AwaitCoroutine != null)
+            {
+                StopCoroutine(_phase3AwaitCoroutine);
+                _phase3AwaitCoroutine = null;
             }
         }
 
@@ -227,7 +243,7 @@ namespace GameResources.Gameplay
         {
             if (!IsPooled)
             {
-                _splineFollower.Execute(Time.deltaTime);
+                _phase3AwaitCoroutine = StartCoroutine(AwaitPhase3PathStart());
             }
         }
 
@@ -247,6 +263,13 @@ namespace GameResources.Gameplay
             OnCenteringReticleDespawned = null;
 
             ReturnToPool();
+        }
+
+        private IEnumerator AwaitPhase3PathStart()
+        {
+            yield return new WaitUntil(() => _phase3startPath);
+
+            _splineFollower.Execute(Time.deltaTime);
         }
 
         private void OnSplinePathComplete()
@@ -295,6 +318,10 @@ namespace GameResources.Gameplay
                     _warmupItemSelected = true;
                     OnWarmupTargetSelected?.Invoke();
                     break;
+                case ProjectileMode.Phase3Projectile:
+                    Debug.LogError("Phase3Projectile | Starting");
+                    _phase3startPath = true;
+                    break;
                 default:
                     break;
             }
@@ -307,7 +334,6 @@ namespace GameResources.Gameplay
                 case ProjectileMode.CenteringReticle:
                     CenteringReticleContracting = false;
                     break;
-
             }
         }
 

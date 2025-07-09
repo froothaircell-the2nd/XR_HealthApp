@@ -64,8 +64,10 @@ namespace GameResources.Gameplay.VRController
         private CursorRefreshMode _refreshMode = CursorRefreshMode.FixedTime;
         private CursorMode _cursorMode = CursorMode.Default;
         private Coroutine _cursorRefreshCoroutine;
-        private Transform _cachedTargetTransform;
-        private Collider _cachedTargetCollider;
+        private Transform _cachedTargetSelectTransform;
+        private Collider _cachedTargetSelectCollider;
+        private Transform _cachedTargetInteractTransform;
+        private Collider _cachedTargetInteractCollider;
         #endregion
 
         #region Events
@@ -216,34 +218,38 @@ namespace GameResources.Gameplay.VRController
                     {
                         if (raycastHitValid)
                         {
-                            if (_cachedTargetTransform == null && _cachedTargetCollider == null)
+                            if (_cachedTargetSelectTransform == null && _cachedTargetSelectCollider == null)
                             {
-                                _cachedTargetTransform = trnsfrm; // cache for future use (but only if the original cache is clean
-                                _cachedTargetCollider = collider;
+                                _cachedTargetSelectTransform = trnsfrm; // cache for future use (but only if the original cache is clean
+                                _cachedTargetSelectCollider = collider;
                             }
 
-                            OnValidSelection?.Invoke(_cachedTargetTransform, _cachedTargetCollider);
+                            OnValidSelection?.Invoke(_cachedTargetSelectTransform, _cachedTargetSelectCollider);
 
                             ResizeCursor(hit, pos, rot);
                             continue;
                         }
 
-                        OnValidSelection?.Invoke(_cachedTargetTransform, _cachedTargetCollider);
-                        ResizeCursor(_cachedTargetTransform, pos, rot); // run with the cached transform instead
+                        OnValidSelection?.Invoke(_cachedTargetSelectTransform, _cachedTargetSelectCollider);
+                        ResizeCursor(_cachedTargetSelectTransform, pos, rot); // run with the cached transform instead
                         continue;
                     }
 
                     // In interaction state
                     ResetCursorDimensions();
 
-                    if (CursorMode == CursorMode.Selected || CursorMode == CursorMode.Interacting)
+                    if ((CursorMode == CursorMode.Selected || CursorMode == CursorMode.Interacting) || 
+                        (trnsfrm != _cachedTargetInteractTransform && collider != _cachedTargetInteractCollider))
                     {
-                        OnValidInteractionStarted?.Invoke(trnsfrm, collider);
+                        _cachedTargetInteractTransform = trnsfrm;
+                        _cachedTargetInteractCollider = collider;
+
+                        OnValidInteractionStarted?.Invoke(_cachedTargetInteractTransform, _cachedTargetInteractCollider);
                         _interactionStarted = true;
                     }
 
                     if (CursorMode == CursorMode.Interacting && _interactionStarted)
-                        OnValidInteractionPerformed?.Invoke(trnsfrm, collider);
+                        OnValidInteractionPerformed?.Invoke(_cachedTargetInteractTransform, _cachedTargetInteractCollider);
 
                     CursorMode = CursorMode.Interacting;
                     continue;
@@ -256,6 +262,9 @@ namespace GameResources.Gameplay.VRController
                 {
                     OnValidInteractionCancelled?.Invoke();
                     _interactionStarted = false;
+
+                    _cachedTargetInteractTransform = null;
+                    _cachedTargetInteractCollider = null;
                 }
             }
 
@@ -335,8 +344,8 @@ namespace GameResources.Gameplay.VRController
             if (CursorMode == CursorMode.Selected && _selectionEnabled)
             {
                 CursorMode = CursorMode.Interacting;
-                _cachedTargetTransform = null;
-                _cachedTargetCollider = null;
+                _cachedTargetSelectTransform = null;
+                _cachedTargetSelectCollider = null;
 
                 OnValidCancellation?.Invoke();
             }
