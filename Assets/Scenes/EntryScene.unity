@@ -215,11 +215,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: 0, y: 2.5, z: 25}
+  m_position: {x: 0, y: 5, z: 25}
   m_precedingControlPointLocalPosition: {x: 0.2, y: 0, z: 0}
-  m_precedingControlPointPosition: {x: 0.5, y: 2.5, z: 25}
+  m_precedingControlPointPosition: {x: 0.5, y: 5, z: 25}
   m_followingControlPointLocalPosition: {x: -0.2, y: -0, z: -0}
-  m_followingControlPointPosition: {x: -0.5, y: 2.5, z: 25}
+  m_followingControlPointPosition: {x: -0.5, y: 5, z: 25}
   m_handleMode: 2
   m_normal: {x: 0, y: -1.45, z: 0}
   m_autoCalculatedNormalAngleOffset: 0
@@ -273,11 +273,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: -3.75, y: -2.5, z: 25}
+  m_position: {x: -3.75, y: 0, z: 25}
   m_precedingControlPointLocalPosition: {x: -0.5, y: 0, z: 0}
-  m_precedingControlPointPosition: {x: -5, y: -2.5, z: 25}
+  m_precedingControlPointPosition: {x: -5, y: 0, z: 25}
   m_followingControlPointLocalPosition: {x: 0.5, y: -0, z: -0}
-  m_followingControlPointPosition: {x: -2.5, y: -2.5, z: 25}
+  m_followingControlPointPosition: {x: -2.5, y: 0, z: 25}
   m_handleMode: 2
   m_normal: {x: 0, y: 1, z: 0}
   m_autoCalculatedNormalAngleOffset: 0
@@ -1630,11 +1630,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: 0, y: -0.625, z: 25}
+  m_position: {x: 0, y: 1.875, z: 25}
   m_precedingControlPointLocalPosition: {x: -0.25, y: -0.18, z: 0}
-  m_precedingControlPointPosition: {x: -0.625, y: -1.0749998, z: 25}
+  m_precedingControlPointPosition: {x: -0.625, y: 1.4250002, z: 25}
   m_followingControlPointLocalPosition: {x: 0.25, y: 0.18, z: -0}
-  m_followingControlPointPosition: {x: 0.625, y: -0.17500019, z: 25}
+  m_followingControlPointPosition: {x: 0.625, y: 2.3249998, z: 25}
   m_handleMode: 2
   m_normal: {x: -0.70710677, y: 0.70710677, z: 0}
   m_autoCalculatedNormalAngleOffset: 0
@@ -2231,11 +2231,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: 2.5, y: -2.5, z: 25}
+  m_position: {x: 2.5, y: 0, z: 25}
   m_precedingControlPointLocalPosition: {x: -0.5, y: -0.5, z: 0}
-  m_precedingControlPointPosition: {x: 1.25, y: -3.75, z: 25}
+  m_precedingControlPointPosition: {x: 1.25, y: -1.25, z: 25}
   m_followingControlPointLocalPosition: {x: 0.5, y: 0.5, z: -0}
-  m_followingControlPointPosition: {x: 3.75, y: -1.25, z: 25}
+  m_followingControlPointPosition: {x: 3.75, y: 1.25, z: 25}
   m_handleMode: 2
   m_normal: {x: -0.70710677, y: 0.70710677, z: 0}
   m_autoCalculatedNormalAngleOffset: 0
@@ -2608,11 +2608,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: -2.5, y: -2.5, z: 25}
+  m_position: {x: -2.5, y: 0, z: 25}
   m_precedingControlPointLocalPosition: {x: -0.5, y: 0.5, z: 0}
-  m_precedingControlPointPosition: {x: -3.75, y: -1.25, z: 25}
+  m_precedingControlPointPosition: {x: -3.75, y: 1.25, z: 25}
   m_followingControlPointLocalPosition: {x: 0.5, y: -0.5, z: -0}
-  m_followingControlPointPosition: {x: -1.25, y: -3.75, z: 25}
+  m_followingControlPointPosition: {x: -1.25, y: -1.25, z: 25}
   m_handleMode: 2
   m_normal: {x: 1, y: 0, z: 0}
   m_autoCalculatedNormalAngleOffset: 0
@@ -3109,11 +3109,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: 3.75, y: 1.25, z: 25}
+  m_position: {x: 3.75, y: 3.75, z: 25}
   m_precedingControlPointLocalPosition: {x: -0.5, y: 0, z: 0}
-  m_precedingControlPointPosition: {x: 2.5, y: 1.25, z: 25}
+  m_precedingControlPointPosition: {x: 2.5, y: 3.75, z: 25}
   m_followingControlPointLocalPosition: {x: 0.5, y: -0, z: -0}
-  m_followingControlPointPosition: {x: 5, y: 1.25, z: 25}
+  m_followingControlPointPosition: {x: 5, y: 3.75, z: 25}
   m_handleMode: 2
   m_normal: {x: 0, y: 1, z: 0}
   m_autoCalculatedNormalAngleOffset: 0
@@ -3196,6 +3196,7 @@ MonoBehaviour:
   - {fileID: 701128731}
   - {fileID: 944416022}
   - {fileID: 885959376}
+  _appCalibrationDistance: 25
 --- !u!1 &578219532
 GameObject:
   m_ObjectHideFlags: 0
@@ -3462,11 +3463,11 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &602612958
@@ -3563,11 +3564,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: -3.75, y: 1.25, z: 25}
+  m_position: {x: -3.75, y: 3.75, z: 25}
   m_precedingControlPointLocalPosition: {x: 0.5, y: 0, z: 0}
-  m_precedingControlPointPosition: {x: -2.5, y: 1.25, z: 25}
+  m_precedingControlPointPosition: {x: -2.5, y: 3.75, z: 25}
   m_followingControlPointLocalPosition: {x: -0.5, y: -0, z: -0}
-  m_followingControlPointPosition: {x: -5, y: 1.25, z: 25}
+  m_followingControlPointPosition: {x: -5, y: 3.75, z: 25}
   m_handleMode: 2
   m_normal: {x: 0, y: -1, z: -0}
   m_autoCalculatedNormalAngleOffset: 0
@@ -3621,11 +3622,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: 2.5, y: 2.5, z: 25}
+  m_position: {x: 2.5, y: 5, z: 25}
   m_precedingControlPointLocalPosition: {x: 0.5, y: -0.5, z: 0}
-  m_precedingControlPointPosition: {x: 3.75, y: 1.25, z: 25}
+  m_precedingControlPointPosition: {x: 3.75, y: 3.75, z: 25}
   m_followingControlPointLocalPosition: {x: -0.5, y: 0.5, z: -0}
-  m_followingControlPointPosition: {x: 1.25, y: 3.75, z: 25}
+  m_followingControlPointPosition: {x: 1.25, y: 6.25, z: 25}
   m_handleMode: 2
   m_normal: {x: -0.70710677, y: -0.70710677, z: -0}
   m_autoCalculatedNormalAngleOffset: 0
@@ -4298,11 +4299,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: 0, y: -0.625, z: 25}
+  m_position: {x: 0, y: 1.875, z: 25}
   m_precedingControlPointLocalPosition: {x: 0.25, y: -0.18, z: 0}
-  m_precedingControlPointPosition: {x: 0.625, y: -1.0749998, z: 25}
+  m_precedingControlPointPosition: {x: 0.625, y: 1.4250002, z: 25}
   m_followingControlPointLocalPosition: {x: -0.25, y: 0.18, z: -0}
-  m_followingControlPointPosition: {x: -0.625, y: -0.17500019, z: 25}
+  m_followingControlPointPosition: {x: -0.625, y: 2.3249998, z: 25}
   m_handleMode: 2
   m_normal: {x: -0.70710677, y: -0.70710677, z: 0}
   m_autoCalculatedNormalAngleOffset: 0
@@ -5244,6 +5245,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfc5f6841582ae14db4b82cde0679008, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _appCalibrationDistance: 15
   _pool: {fileID: 1426362292}
   _dataHandler: {fileID: 159113223}
   _gameSetWarmup: {fileID: 2130264085}
@@ -5261,7 +5263,7 @@ MonoBehaviour:
   - {fileID: 1775212558}
   - {fileID: 191060339}
   _lookAreaGenerator: {fileID: 1623276158}
-  _gameSetPhase2and4: {fileID: 1501821579}
+  _gameSetPhase2: {fileID: 1501821579}
   _spawnCenter: {fileID: 442297610}
   _minSpawnDelay: 2
   _maxSpawnDelay: 8
@@ -6228,11 +6230,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: -2.5, y: 2.5, z: 25}
+  m_position: {x: -2.5, y: 5, z: 25}
   m_precedingControlPointLocalPosition: {x: 0.2, y: 0.2, z: 0}
-  m_precedingControlPointPosition: {x: -2, y: 3, z: 25}
+  m_precedingControlPointPosition: {x: -2, y: 5.5, z: 25}
   m_followingControlPointLocalPosition: {x: -0.2, y: -0.2, z: -0}
-  m_followingControlPointPosition: {x: -3, y: 2, z: 25}
+  m_followingControlPointPosition: {x: -3, y: 4.5, z: 25}
   m_handleMode: 2
   m_normal: {x: 1, y: -1, z: -0}
   m_autoCalculatedNormalAngleOffset: 0
@@ -6468,11 +6470,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: 3.75, y: -2.5, z: 25}
+  m_position: {x: 3.75, y: 0, z: 25}
   m_precedingControlPointLocalPosition: {x: 0.5, y: 0, z: 0}
-  m_precedingControlPointPosition: {x: 5, y: -2.5, z: 25}
+  m_precedingControlPointPosition: {x: 5, y: 0, z: 25}
   m_followingControlPointLocalPosition: {x: -0.5, y: -0, z: -0}
-  m_followingControlPointPosition: {x: 2.5, y: -2.5, z: 25}
+  m_followingControlPointPosition: {x: 2.5, y: 0, z: 25}
   m_handleMode: 2
   m_normal: {x: 0, y: -1, z: 0}
   m_autoCalculatedNormalAngleOffset: 0
@@ -6712,11 +6714,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: 2.5, y: 2.5, z: 25}
+  m_position: {x: 2.5, y: 5, z: 25}
   m_precedingControlPointLocalPosition: {x: 0.2, y: -0.2, z: 0}
-  m_precedingControlPointPosition: {x: 3, y: 2, z: 25}
+  m_precedingControlPointPosition: {x: 3, y: 4.5, z: 25}
   m_followingControlPointLocalPosition: {x: -0.2, y: 0.2, z: -0}
-  m_followingControlPointPosition: {x: 2, y: 3, z: 25}
+  m_followingControlPointPosition: {x: 2, y: 5.5, z: 25}
   m_handleMode: 2
   m_normal: {x: -1, y: -1, z: -0}
   m_autoCalculatedNormalAngleOffset: 0
@@ -7153,6 +7155,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7355358310983813835, guid: 73d680c6fe00f2c4b9cc8785619ff823, type: 3}
+      propertyPath: m_Name
+      value: Black Screen Handler
+      objectReference: {fileID: 0}
+    - target: {fileID: 7355358310983813835, guid: 73d680c6fe00f2c4b9cc8785619ff823, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7323,11 +7333,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: -2.5, y: 2.5, z: 25}
+  m_position: {x: -2.5, y: 5, z: 25}
   m_precedingControlPointLocalPosition: {x: 0.5, y: 0.5, z: 0}
-  m_precedingControlPointPosition: {x: -1.25, y: 3.75, z: 25}
+  m_precedingControlPointPosition: {x: -1.25, y: 6.25, z: 25}
   m_followingControlPointLocalPosition: {x: -0.5, y: -0.5, z: -0}
-  m_followingControlPointPosition: {x: -3.75, y: 1.25, z: 25}
+  m_followingControlPointPosition: {x: -3.75, y: 3.75, z: 25}
   m_handleMode: 2
   m_normal: {x: 0.70710677, y: -0.70710677, z: -0}
   m_autoCalculatedNormalAngleOffset: 0
@@ -7378,7 +7388,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1501821580}
   m_Layer: 0
-  m_Name: Game Set - Application Phase 2 and 4
+  m_Name: Game Set - Application Phase 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7477,11 +7487,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: -5.5, y: -0.625, z: 25}
+  m_position: {x: -5.5, y: 1.875, z: 25}
   m_precedingControlPointLocalPosition: {x: 0, y: 0.25, z: 0}
-  m_precedingControlPointPosition: {x: -5.5, y: 0, z: 25}
+  m_precedingControlPointPosition: {x: -5.5, y: 2.5, z: 25}
   m_followingControlPointLocalPosition: {x: -0, y: -0.25, z: -0}
-  m_followingControlPointPosition: {x: -5.5, y: -1.25, z: 25}
+  m_followingControlPointPosition: {x: -5.5, y: 1.25, z: 25}
   m_handleMode: 2
   m_normal: {x: 1, y: 0, z: 0}
   m_autoCalculatedNormalAngleOffset: 0
@@ -8281,11 +8291,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: 5.5, y: -0.625, z: 25}
+  m_position: {x: 5.5, y: 1.875, z: 25}
   m_precedingControlPointLocalPosition: {x: 0, y: 0.25, z: 0}
-  m_precedingControlPointPosition: {x: 5.5, y: 0, z: 25}
+  m_precedingControlPointPosition: {x: 5.5, y: 2.5, z: 25}
   m_followingControlPointLocalPosition: {x: -0, y: -0.25, z: -0}
-  m_followingControlPointPosition: {x: 5.5, y: -1.25, z: 25}
+  m_followingControlPointPosition: {x: 5.5, y: 1.25, z: 25}
   m_handleMode: 2
   m_normal: {x: 1, y: 0, z: 0}
   m_autoCalculatedNormalAngleOffset: 0
@@ -8581,11 +8591,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: -2.875, y: -2.5, z: 25}
+  m_position: {x: -2.875, y: 0, z: 25}
   m_precedingControlPointLocalPosition: {x: -0.2, y: 0.2, z: 0}
-  m_precedingControlPointPosition: {x: -3.375, y: -2, z: 25}
+  m_precedingControlPointPosition: {x: -3.375, y: 0.5, z: 25}
   m_followingControlPointLocalPosition: {x: 0.2, y: -0.2, z: -0}
-  m_followingControlPointPosition: {x: -2.375, y: -3, z: 25}
+  m_followingControlPointPosition: {x: -2.375, y: -0.5, z: 25}
   m_handleMode: 2
   m_normal: {x: 1.45, y: 1, z: 0}
   m_autoCalculatedNormalAngleOffset: 0
@@ -8758,11 +8768,11 @@ MeshCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!23 &1943284959
@@ -9593,7 +9603,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 9.22}
+  m_AnchoredPosition: {x: 0, y: 9.5}
   m_SizeDelta: {x: 3.5, y: 3.5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!225 &2036393490
@@ -9715,11 +9725,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: 2.5, y: -2.5, z: 25}
+  m_position: {x: 2.5, y: 0, z: 25}
   m_precedingControlPointLocalPosition: {x: -0.2, y: -0.2, z: 0}
-  m_precedingControlPointPosition: {x: 2, y: -3, z: 25}
+  m_precedingControlPointPosition: {x: 2, y: -0.5, z: 25}
   m_followingControlPointLocalPosition: {x: 0.2, y: 0.2, z: -0}
-  m_followingControlPointPosition: {x: 3, y: -2, z: 25}
+  m_followingControlPointPosition: {x: 3, y: 0.5, z: 25}
   m_handleMode: 2
   m_normal: {x: -1, y: 1, z: 0}
   m_autoCalculatedNormalAngleOffset: 0
@@ -9946,11 +9956,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: -2.5, y: -2.5, z: 25}
+  m_position: {x: -2.5, y: 0, z: 25}
   m_precedingControlPointLocalPosition: {x: -0.2, y: 0.2, z: 0}
-  m_precedingControlPointPosition: {x: -3, y: -2, z: 25}
+  m_precedingControlPointPosition: {x: -3, y: 0.5, z: 25}
   m_followingControlPointLocalPosition: {x: 0.2, y: -0.2, z: -0}
-  m_followingControlPointPosition: {x: -2, y: -3, z: 25}
+  m_followingControlPointPosition: {x: -2, y: -0.5, z: 25}
   m_handleMode: 2
   m_normal: {x: 1, y: 1, z: 0}
   m_autoCalculatedNormalAngleOffset: 0
@@ -10260,11 +10270,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b9cf9c5931a3b3c4ba456c8213d7ebfc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_position: {x: 2.875, y: -2.5, z: 25}
+  m_position: {x: 2.875, y: 0, z: 25}
   m_precedingControlPointLocalPosition: {x: -0.2, y: -0.2, z: 0}
-  m_precedingControlPointPosition: {x: 2.375, y: -3, z: 25}
+  m_precedingControlPointPosition: {x: 2.375, y: -0.5, z: 25}
   m_followingControlPointLocalPosition: {x: 0.2, y: 0.2, z: -0}
-  m_followingControlPointPosition: {x: 3.375, y: -2, z: 25}
+  m_followingControlPointPosition: {x: 3.375, y: 0.5, z: 25}
   m_handleMode: 2
   m_normal: {x: -1.45, y: 1, z: 0}
   m_autoCalculatedNormalAngleOffset: 0

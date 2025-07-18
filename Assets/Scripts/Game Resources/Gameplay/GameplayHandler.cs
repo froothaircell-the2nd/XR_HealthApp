@@ -5,6 +5,7 @@ using CoreResources.Utils;
 using GameResources.Gameplay.VRController;
 using GameResources.Pooling;
 using GameResources.StateMachine;
+using GameResources.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -27,6 +28,8 @@ namespace GameResources.Gameplay
     {
         #region Serialized Fields
         [SerializeField]
+        private float _appCalibrationDistance = 15f;
+        [SerializeField]
         private ObjectPool _pool;
         [SerializeField]
         private PhysiologicalDataHandler _dataHandler;
@@ -47,9 +50,9 @@ namespace GameResources.Gameplay
 
         [Space(5)]
         
-        [Header("Game Set - Application Phase 2 and 4")]
+        [Header("Game Set - Application Phase 2")]
         [SerializeField]
-        private GameObject _gameSetPhase2and4;
+        private GameObject _gameSetPhase2;
         [SerializeField]
         private Transform _spawnCenter;
         [SerializeField]
@@ -160,6 +163,23 @@ namespace GameResources.Gameplay
         }
         #endregion
 
+        #region Public Methods
+        public void CalibrateSceneToCameraOrientation()
+        {
+            // Set Positions of relevant 
+            Vector3 forward = _camHMD.forward;
+            Vector3 origin = _camHMD.position;
+            Vector3 finalPosition = origin + forward * _appCalibrationDistance;
+
+            _gameSetWarmup.transform.position = finalPosition;
+            _lookAreaGenerator.transform.position = finalPosition;
+            _gameSetPhase2.transform.position = finalPosition;
+            _gameSetPhase3.transform.position = finalPosition;
+
+            UIMediator.Instance.SetMenuPositions(_camHMD, forward, origin);
+        }
+        #endregion
+
         #region Event Listeners
         private void OnPlay(int appPhase)
         {
@@ -194,7 +214,7 @@ namespace GameResources.Gameplay
                     ResetGame(false);
 
                     _gameSetWarmup.SetActive(false);
-                    _gameSetPhase2and4.SetActive(true);
+                    _gameSetPhase2.SetActive(true);
                     _lookAreaGenerator.gameObject.SetActive(true);
                     _lookAreaGenerator.AllowLookAreaModification();
 
@@ -221,7 +241,7 @@ namespace GameResources.Gameplay
                     _gameSetPhase3.SetActive(true);
                     _lookAreaGenerator.RestrictLookAreaModification();
                     _lookAreaGenerator.gameObject.SetActive(false);
-                    _gameSetPhase2and4.SetActive(false);
+                    _gameSetPhase2.SetActive(false);
 
                     _interactionPanel_AppP3.InitializePanel();
 
@@ -581,7 +601,7 @@ namespace GameResources.Gameplay
             if (hardRest)
             {
                 _gameSetWarmup.SetActive(false);
-                _gameSetPhase2and4.SetActive(false);
+                _gameSetPhase2.SetActive(false);
                 _gameSetPhase3.SetActive(false);
 
                 foreach (var item in _bezierSplines)

@@ -54,7 +54,7 @@ namespace GameResources.UI
             if (!App_StateMachineMediator.IsInstantiated)
                 return;
 
-            App_StateMachineMediator.Instance.QuitCurrentAppPhase();
+            App_StateMachineMediator.Instance.GoToMenu();
         }
 
         private void OnNextButtonClicked()

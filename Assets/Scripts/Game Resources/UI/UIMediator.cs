@@ -13,6 +13,8 @@ namespace GameResources.UI
         #region Serialized Fields
         [SerializeField]
         private List<UIViewManager> _viewManagers = new List<UIViewManager>();
+        [SerializeField]
+        private float _appCalibrationDistance = 25f;
         #endregion
 
         #region Overrides
@@ -48,6 +50,16 @@ namespace GameResources.UI
         #endregion
 
         #region Public Methods
+        public void SetMenuPositions(Transform cameraTransform, Vector3 origin, Vector3 forward)
+        {
+            Vector3 finalPosition = origin + forward * _appCalibrationDistance;
+
+            foreach (UIViewManager manager in _viewManagers)
+            {
+                manager.transform.position = finalPosition;
+            }
+        }
+
         public void ResetMenus()
         {
             HideMenus();

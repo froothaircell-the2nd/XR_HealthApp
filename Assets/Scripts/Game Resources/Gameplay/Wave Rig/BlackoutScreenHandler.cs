@@ -4,76 +4,79 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BlackoutScreenHandler : DestroyableMonoSingleton<BlackoutScreenHandler>
+namespace GameResources.Gameplay.VRController
 {
-    [SerializeField]
-    private Image _blackScreen;
-    [SerializeField]
-    private TextMeshProUGUI _blackScreenText;
-    [SerializeField]
-    private float _screenTransitionDelay = 0.15f;
-    [SerializeField]
-    private float _textTransitionDelay = 0.05f;
-
-    private Color _defaultImageColor;
-    private Color _transparentImageColor;
-    private Color _defaultTextColor;
-    private Color _transparentTextColor;
-    private CanvasGroup _canvasGroup;
-
-    #region Overrides
-    public override void OnInit()
+    public class BlackoutScreenHandler : DestroyableMonoSingleton<BlackoutScreenHandler>
     {
-        _defaultImageColor = _transparentImageColor = Color.black;
-        _defaultImageColor.a = 1;
-        _transparentImageColor.a = 0;
+        [SerializeField]
+        private Image _blackScreen;
+        [SerializeField]
+        private TextMeshProUGUI _blackScreenText;
+        [SerializeField]
+        private float _screenTransitionDelay = 0.15f;
+        [SerializeField]
+        private float _textTransitionDelay = 0.05f;
 
-        _defaultTextColor = _transparentTextColor = Color.white;
-        _defaultTextColor.a = 1;
-        _transparentTextColor.a = 0;
+        private Color _defaultImageColor;
+        private Color _transparentImageColor;
+        private Color _defaultTextColor;
+        private Color _transparentTextColor;
+        private CanvasGroup _canvasGroup;
 
-        _blackScreen.color = _transparentImageColor;
-        _blackScreenText.color = _transparentTextColor;
-        _blackScreenText.text = "";
-
-        _canvasGroup = GetComponent<CanvasGroup>();
-        _canvasGroup.blocksRaycasts = false;
-        _canvasGroup.interactable = false;
-
-    }
-
-    public override void OnDeInit()
-    {
-    }
-    #endregion
-
-    #region Public Methods
-    public void SetBlackoutScreen(bool status, string screenText = "")
-    {
-        if (status)
+        #region Overrides
+        public override void OnInit()
         {
-            _blackScreenText.text = screenText;
-            _blackScreen.DOColor(_defaultImageColor, _screenTransitionDelay).OnComplete(() =>
-            {
-                _blackScreenText.DOColor(_defaultTextColor, _textTransitionDelay).OnComplete(() =>
-                {
-                    _canvasGroup.blocksRaycasts = false;
-                    _canvasGroup.interactable = false;
-                });
-            });
+            _defaultImageColor = _transparentImageColor = Color.black;
+            _defaultImageColor.a = 1;
+            _transparentImageColor.a = 0;
+
+            _defaultTextColor = _transparentTextColor = Color.white;
+            _defaultTextColor.a = 1;
+            _transparentTextColor.a = 0;
+
+            _blackScreen.color = _defaultImageColor;
+            _blackScreenText.color = _defaultTextColor;
+            _blackScreenText.text = "Loading...";
+
+            _canvasGroup = GetComponent<CanvasGroup>();
+            _canvasGroup.blocksRaycasts = false;
+            _canvasGroup.interactable = false;
+
         }
-        else
+
+        public override void OnDeInit()
         {
-            _blackScreen.DOColor(_transparentImageColor, _screenTransitionDelay).OnComplete(() => 
-            {
-                _blackScreenText.DOColor(_transparentTextColor, _textTransitionDelay).OnComplete(() =>
-                {
-                    _canvasGroup.blocksRaycasts = false;
-                    _canvasGroup.interactable = false;
-                    _blackScreenText.text = screenText;
-                });
-            });
         }
+        #endregion
+
+        #region Public Methods
+        public void SetBlackoutScreen(bool status, string screenText = "")
+        {
+            if (status)
+            {
+                _blackScreenText.text = screenText;
+                _blackScreen.DOColor(_defaultImageColor, _screenTransitionDelay).OnComplete(() =>
+                {
+                    _blackScreenText.DOColor(_defaultTextColor, _textTransitionDelay).OnComplete(() =>
+                    {
+                        _canvasGroup.blocksRaycasts = false;
+                        _canvasGroup.interactable = false;
+                    });
+                });
+            }
+            else
+            {
+                _blackScreen.DOColor(_transparentImageColor, _screenTransitionDelay).OnComplete(() => 
+                {
+                    _blackScreenText.DOColor(_transparentTextColor, _textTransitionDelay).OnComplete(() =>
+                    {
+                        _canvasGroup.blocksRaycasts = false;
+                        _canvasGroup.interactable = false;
+                        _blackScreenText.text = screenText;
+                    });
+                });
+            }
+        }
+        #endregion
     }
-    #endregion
 }

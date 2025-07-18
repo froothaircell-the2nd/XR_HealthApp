@@ -34,7 +34,7 @@ namespace GameResources.StateMachine
 
             _fsm = new App_StateMachine();
 
-            _fsm.GoToStateNonHistorically<AppState_InitMenu>();
+            _fsm.GoToStateNonHistorically<AppState_AppCalibration>();
         }
 
         public override void CleanSingleton()
@@ -99,16 +99,12 @@ namespace GameResources.StateMachine
         /// application variant or to 
         /// return to main menu
         /// </summary>
-        public void QuitCurrentAppPhase()
+        public void GoToMenu()
         {
             if (!IsInstantiated)
                 return;
 
-            if (_fsm.CurrentStateType == typeof(AppState_Warmup) ||
-                _fsm.CurrentStateType == typeof(AppState_AppPhase1) ||
-                _fsm.CurrentStateType == typeof(AppState_AppPhase2) ||
-                _fsm.CurrentStateType == typeof(AppState_AppPhase3) ||
-                _fsm.CurrentStateType == typeof(AppState_AppPhase4))
+            if (_fsm.CurrentStateType != typeof(AppState_InitMenu))
                 _fsm.GoToState<AppState_InitMenu>();
         }
 

@@ -1,13 +1,48 @@
+using CoreResources.Managers.InputManagement;
 using CoreResources.StateMachine;
 using GameResources.Gameplay;
 using GameResources.Gameplay.VRController;
 using GameResources.UI;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace GameResources.StateMachine
 {
     public class App_State : StateHistory<App_StateMachine, App_State>
     {
+    }
+
+    public class AppState_AppCalibration : App_State
+    {
+        public override void OnEnter()
+        {
+            if (!BlackoutScreenHandler.IsInstantiated)
+            {
+                Debug.LogError("Blackout Screen not instantiated!");
+                return;
+            }
+
+            BlackoutScreenHandler.Instance.SetBlackoutScreen(true, "Please center the head position and press the grip button.");
+            InputManager.InputActions.XRIRightHandInteraction.Select.performed += OnCalibrationComplete;
+        }
+
+        public override void OnExit()
+        {
+            if (!BlackoutScreenHandler.IsInstantiated)
+            {
+                Debug.LogError("Blackout Screen not instantiated!");
+                return;
+            }
+
+            BlackoutScreenHandler.Instance.SetBlackoutScreen(false);
+            InputManager.InputActions.XRIRightHandInteraction.Select.performed -= OnCalibrationComplete;
+        }
+
+        private void OnCalibrationComplete(InputAction.CallbackContext obj)
+        {
+            GameplayHandler.Instance.CalibrateSceneToCameraOrientation();
+            App_StateMachineMediator.Instance.GoToMenu();
+        }
     }
 
     /// <summary>
