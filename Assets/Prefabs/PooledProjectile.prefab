@@ -33,8 +33,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -7.945464, y: 0.6, z: -2.442215}
-  m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.85, y: 0.85, z: 0.85}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -179,11 +179,12 @@ MonoBehaviour:
   travelMode: 0
   speed: 1.9
   m_normalizedT: 0
-  rotationLerpModifier: 10
+  rotationLerpModifier: 100
   lookAt: 1
   onPathCompleted:
     m_PersistentCalls:
       m_Calls: []
+  executionStatus: 0
 --- !u!96 &-2675595989743708932
 TrailRenderer:
   serializedVersion: 3

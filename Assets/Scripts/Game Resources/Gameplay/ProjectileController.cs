@@ -16,7 +16,7 @@ namespace GameResources.Gameplay
         CenteringReticle = 0,
         Phase2Projectile = 1,   // Projectiles that get shot towards user in phase 2
         Phase3Projectile = 2,   // Projectile that will move on a fixed route in phase 3
-        Phase4Target = 3,
+        Phase4Target = 3,       // Target that, once looked at, will trigger the black screen for recentering
         WarmupTarget = 4,
     }
 
@@ -46,6 +46,7 @@ namespace GameResources.Gameplay
         private Color _centeringReticleColor,
             _phase2ProjectileColor,
             _phase3ProjectileColor,
+            _phase4TargetColor,
             _warmupTargetColor1, _warmupTargetColor2;
         [SerializeField]
         TrailRenderer _trailRenderer;
@@ -68,6 +69,7 @@ namespace GameResources.Gameplay
         public Action OnWarmupTargetSelected = null;
         public Action OnCenteringReticleDespawned = null;
         public Action OnPhase3ProjectileDespawned = null;
+        public Action OnPhase4TargetDespawned = null;
 
         public bool IsInteractable
         {
@@ -124,6 +126,7 @@ namespace GameResources.Gameplay
 
                     _phase3startPath = false;
                     _splineFollower.enabled = true;
+                    _splineFollower.executionStatus = false;
                     _splineFollower.speed = _followSpeed;
                     _splineFollower.travelMode = TravelMode.Once;
                     _splineFollower.onPathCompleted.AddListener(OnSplinePathComplete);
@@ -136,6 +139,9 @@ namespace GameResources.Gameplay
                         _phase3AwaitCoroutine = null;
                     }
 
+                    break;
+                case ProjectileMode.Phase4Target:
+                    _projectileMaterial.SetColor("_EmissionColor", _phase4TargetColor);
                     break;
                 case ProjectileMode.WarmupTarget:
                     _projectileMaterial.SetColor("_EmissionColor", _warmupTargetColor1);
@@ -265,16 +271,26 @@ namespace GameResources.Gameplay
             ReturnToPool();
         }
 
+        private void DespawnPhase4Target()
+        {
+            OnPhase4TargetDespawned?.Invoke();
+            OnPhase4TargetDespawned = null;
+
+            ReturnToPool();
+        }
+
         private IEnumerator AwaitPhase3PathStart()
         {
             yield return new WaitUntil(() => _phase3startPath);
 
-            _splineFollower.Execute(Time.deltaTime);
+            // _splineFollower.Execute(Time.deltaTime);
+            _splineFollower.executionStatus = true;
         }
 
         private void OnSplinePathComplete()
         {
             GameplayHandler.OnEnablePhase3NextButton?.Invoke();
+            _splineFollower.executionStatus = false;
             ReturnToPool();
         }
         #endregion
@@ -294,7 +310,6 @@ namespace GameResources.Gameplay
                     GameplayHandler.OnPhase2Hit?.Invoke();
                     ReturnToPool();
                     break;
-
             }
         }
 
@@ -319,8 +334,11 @@ namespace GameResources.Gameplay
                     OnWarmupTargetSelected?.Invoke();
                     break;
                 case ProjectileMode.Phase3Projectile:
-                    Debug.LogError("Phase3Projectile | Starting");
+                    // Debug.LogError("Phase3Projectile | Starting");
                     _phase3startPath = true;
+                    break;
+                case ProjectileMode.Phase4Target:
+                    DespawnPhase4Target();
                     break;
                 default:
                     break;
@@ -343,6 +361,7 @@ namespace GameResources.Gameplay
                 _splineFollower.spline = spline;
 
             _splineFollower.NormalizedT = 0;
+            _splineFollower.executionStatus = false;
             // transform.position = spline[0].position;
         }
         #endregion

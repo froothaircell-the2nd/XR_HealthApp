@@ -39,9 +39,13 @@ namespace BezierSolution
 		private bool onPathCompletedCalledAt1 = false;
 		private bool onPathCompletedCalledAt0 = false;
 
+		// Custom additions to make sure this works right ig
+		public bool executionStatus = false;
+
 		private void Update()
 		{
-			// Execute( Time.deltaTime );
+			if (executionStatus)
+				Execute( Time.deltaTime );
 		}
 
 		public override void Execute( float deltaTime )

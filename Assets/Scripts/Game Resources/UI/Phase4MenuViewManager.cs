@@ -7,13 +7,16 @@ namespace GameResources.UI
 {
     public class Phase4MenuViewManager : UIViewManager<Phase4MenuViewManager, Phase4MenuView>
     {
+        private bool _phase4Complete = false;
+
         #region Overrides
         protected override void OnInitialize()
         {
             view.ExitButton.onClick.AddListener(OnExitButtonClicked);
             view.NextButton.onClick.AddListener(OnNextButtonClicked);
 
-            GameplayHandler.OnPhase4Complete += OnNextButtonEnabled;
+            GameplayHandler.OnEnablePhase4NextButton += OnEnableNextButton;
+            GameplayHandler.OnPhase4Complete += OnPhase4Complete;
         }
 
         protected override void OnDeInitialize()
@@ -21,7 +24,8 @@ namespace GameResources.UI
             view.ExitButton.onClick.RemoveAllListeners();
             view.NextButton.onClick.RemoveAllListeners();
 
-            GameplayHandler.OnPhase4Complete -= OnNextButtonEnabled;
+            GameplayHandler.OnEnablePhase4NextButton -= OnEnableNextButton;
+            GameplayHandler.OnPhase4Complete -= OnPhase4Complete;
         }
 
         public override void OnShowPanel()
@@ -49,15 +53,27 @@ namespace GameResources.UI
 
         private void OnNextButtonClicked()
         {
-            if (!App_StateMachineMediator.IsInstantiated)
-                return;
+            if (_phase4Complete)
+            {
+                if (!App_StateMachineMediator.IsInstantiated)
+                    return;
 
-            App_StateMachineMediator.Instance.QuitCurrentAppPhase();
+                App_StateMachineMediator.Instance.QuitCurrentAppPhase();
+                return;
+            }
+
+            GameplayHandler.OnPhase4NextItem?.Invoke();
+            view.NextButton.interactable = false;
         }
 
-        private void OnNextButtonEnabled()
+        private void OnEnableNextButton()
         {
             view.NextButton.interactable = true;
+        }
+
+        private void OnPhase4Complete()
+        {
+            _phase4Complete = true;
         }
         #endregion
     }

@@ -9,6 +9,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace GameResources.Gameplay
 {
@@ -72,6 +73,11 @@ namespace GameResources.Gameplay
         [SerializeField]
         private InteractionPanel _interactionPanel_AppP3;
 
+        [Space(5)]
+
+        [Header("Game Set - Application Phase 4")]
+        [SerializeField, Range(0, 8)]
+        private int _phase4TargetSpawnCount = 2; 
         #endregion
 
         #region Private Fields
@@ -79,14 +85,20 @@ namespace GameResources.Gameplay
         private Quaternion _defaultSpawnRotation;
         private Coroutine _spawnCoroutine;
         private int _spawnCount, _warmupSelectedCount;
-        private bool _triggerPressed,
+        private bool _triggerPressed = false,
+            _inputsAssigned = false,
             _centeringReticleDespawned = false,
             _phase2ProjectileDespawned = false,
-            _phase3NextProjectileRequested = false;
+            _phase3NextProjectileRequested = false,
+            _phase4TargetRequested = false,
+            _phase4TargetDespawned = false,
+            _phase4HeadRecentered = false;
         private AppPhase _phase;
 
         private ProjectileController _cachedProjectile_Interaction = null;
         private ProjectileController _cachedProjectile_Selection = null;
+
+        private const string P4_BLACKOUT_TEXT = "Please recenter your head position and then press the right grip button";
         #endregion
 
         public AppPhase Phase => _phase;
@@ -105,6 +117,8 @@ namespace GameResources.Gameplay
         public static Action OnEnablePhase3NextButton;
         public static Action OnPhase3NextItem;
         public static Action OnPhase3Complete;
+        public static Action OnEnablePhase4NextButton;
+        public static Action OnPhase4NextItem;
         public static Action OnPhase4Complete;
         #endregion
 
@@ -120,6 +134,11 @@ namespace GameResources.Gameplay
             OnExitEvent += OnExit;
             OnPhase2Hit += OnHitPerformed_AppP2;
             OnPhase3NextItem += OnNextProjectileRequested_AppP3;
+            OnPhase4NextItem += OnNextProjectileRequested_AppP4;
+
+            _inputsAssigned = false;
+
+            StartCoroutine(WaitForInputSystem());
         }
 
         public override void OnDeInit()
@@ -132,176 +151,12 @@ namespace GameResources.Gameplay
             OnEnablePhase3NextButton = null;
             OnPhase3NextItem = null;
             OnPhase3Complete = null;
+            OnPhase4NextItem = null;
             OnPhase4Complete = null;
 
             _dataHandler.CleanSingleton();
 
             ResetGame();
-        }
-        #endregion
-
-        #region Private Methods
-        private void InitializeWarmupTarget(PooledItem item)
-        {
-            var res = (ProjectileController)item;
-
-            res.InitializeItem(ProjectileMode.WarmupTarget);
-        }
-
-        private void InitializeCenterCursor(PooledItem item)
-        {
-            var res = (ProjectileController) item;
-
-            res.InitializeItem(ProjectileMode.CenteringReticle);
-            res.OnCenteringReticleDespawned += () => { _centeringReticleDespawned = true; };
-        }
-
-        private void InitalizePhase2Projectile(PooledItem item)
-        {
-            var res = (ProjectileController) item;
-
-            res.InitializeItem(ProjectileMode.Phase2Projectile);
-        }
-
-        private void InitializePhase3Projectile(PooledItem item, BezierSpline spline)
-        {
-            var res = (ProjectileController) item;
-
-            res.InitializeItem(ProjectileMode.Phase3Projectile);
-            res.InjectSpline(spline);
-        }
-
-        private void ResetGame(bool hardRest = true)
-        {
-            if (_spawnCoroutine != null)
-            {
-                StopCoroutine(_spawnCoroutine);
-                _spawnCoroutine = null;
-            }
-
-            if (_cachedProjectile_Interaction != null)
-            {
-                _cachedProjectile_Interaction.ReturnToPool();
-                _cachedProjectile_Interaction = null;
-            }
-
-            _phase = 0;
-
-            _centeringReticleDespawned = false;
-            _phase2ProjectileDespawned = false;
-
-            _spawnCenter.localPosition = _defaultSpawnPosition;
-            _spawnCenter.rotation = _defaultSpawnRotation;
-
-            _interactionPanel_AppP3.DeInitializePanel();
-
-            if (hardRest)
-            {
-                _gameSetWarmup.SetActive(false);
-                _gameSetPhase2and4.SetActive(false);
-                _gameSetPhase3.SetActive(false);
-
-                foreach (var item in _bezierSplines)
-                {
-                    item.gameObject.SetActive(false);
-                }
-
-                _lookAreaGenerator.RestrictLookAreaModification();
-                _lookAreaGenerator.gameObject.SetActive(false);
-
-                _dataHandler.ResetMetrics();
-            }
-
-            _pool.CleanPool();
-            _spawnCount = 0;
-            _warmupSelectedCount = 0;
-        }
-
-        private IEnumerator SpawnCoroutine_Warmup()
-        {
-            _spawnCount = 0;
-            _warmupSelectedCount = 0;
-
-            int maxCount = _defaultTransforms.Length;
-
-            while (_spawnCount < maxCount)
-            {
-                var currTrnsfrm = _defaultTransforms[_spawnCount];
-
-                ProjectileController item = (ProjectileController) _pool.SpawnItem(currTrnsfrm.position, currTrnsfrm.rotation, InitializeWarmupTarget);
-
-                item.OnWarmupTargetSelected += OnWarmupTargetSelected;
-
-                ++_spawnCount;
-            }
-
-            yield return new WaitUntil(() => _warmupSelectedCount >= maxCount);
-
-            OnWarmupComplete?.Invoke();
-        }
-
-        private IEnumerator SpawnCoroutine_AppP2()
-        {
-            _spawnCount = 0;
-
-            while (_spawnCount < _phase2SpawnCount)
-            {
-                // var angleRad = UnityEngine.Random.Range(0f, 360f).ToRadians();
-                // var radius = UnityEngine.Random.Range(_minSpawnRadius2, _maxSpawnRadius2);
-                var pos = _lookAreaGenerator.GetRandomPointOnMesh();
-                var dir = (pos - _camHMD.position).normalized;
-                pos += (dir * UnityEngine.Random.Range(0f, _maxSpawnDistance));
-
-                // Access the look area handler and use the spawn function
-                // var delay = UnityEngine.Random.Range(_minSpawnDelay, _maxSpawnDelay);
-
-                // yield return new WaitForSecondsRealtime(delay);
-                _spawnCenter.localPosition = Vector3.zero;
-                _spawnCenter.localRotation = Quaternion.identity;
-                _pool.SpawnItem(_spawnCenter.position, _spawnCenter.rotation, InitializeCenterCursor);
-
-                yield return new WaitUntil(() => _centeringReticleDespawned);
-
-                // spawn on a random location within a radius range and angle range
-                _spawnCenter.position = pos;
-                _spawnCenter.LookAt(_camHMD);
-                _pool.SpawnItem(_spawnCenter.position, _spawnCenter.rotation, InitalizePhase2Projectile);
-                ++_spawnCount;
-
-                _centeringReticleDespawned = false;
-
-                yield return new WaitUntil(() => _phase2ProjectileDespawned);
-
-                _phase2ProjectileDespawned = false;
-            }
-
-            ResetGame(false);
-
-            OnPhase2Complete?.Invoke();
-        }
-
-        private IEnumerator SpawnCoroutine_AppP3()
-        {
-            _spawnCount = 0;
-
-            while (_spawnCount < _bezierSplines.Length)
-            {
-                var currSpline = _bezierSplines[_spawnCount];
-                currSpline.gameObject.SetActive(true);
-
-                _spawnCenter.position = currSpline.GetPoint(0);
-                _pool.SpawnItem(_spawnCenter.position, _spawnCenter.rotation, (item) => { InitializePhase3Projectile(item, currSpline); });
-                ++_spawnCount;
-
-                yield return new WaitUntil(() => _phase3NextProjectileRequested);
-
-                currSpline.gameObject.SetActive(false);
-                _phase3NextProjectileRequested = false;
-            }
-
-            ResetGame(false);
-
-            OnPhase3Complete?.Invoke();
         }
         #endregion
 
@@ -368,7 +223,7 @@ namespace GameResources.Gameplay
                     _lookAreaGenerator.gameObject.SetActive(false);
                     _gameSetPhase2and4.SetActive(false);
 
-                    _interactionPanel_AppP3.InitializePanel();    
+                    _interactionPanel_AppP3.InitializePanel();
 
                     _pool.UnlockPool();
 
@@ -384,6 +239,19 @@ namespace GameResources.Gameplay
                     break;
                 case 5:
                     // Initialization for proprioception test
+                    _gameSetPhase3.SetActive(false);
+                    _lookAreaGenerator.RestrictLookAreaModification();
+                    _lookAreaGenerator.gameObject.SetActive(true);
+                    // _gameSetPhase2and4.SetActive(true);
+
+                    foreach (var item in _bezierSplines)
+                    {
+                        item.gameObject.SetActive(false);
+                    }
+
+                    _spawnCoroutine = StartCoroutine(SpawnCoroutine_AppP4());
+
+                    _phase = (AppPhase)appPhase;
                     break;
                 default:
                     break;
@@ -402,6 +270,19 @@ namespace GameResources.Gameplay
             ResetGame();
         }
 
+        private void RightGripPressed(InputAction.CallbackContext obj)
+        {
+            switch (_phase)
+            {
+                case AppPhase.Phase4:
+                    if (_phase4TargetDespawned && !_phase4HeadRecentered)
+                        _phase4HeadRecentered = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+
         private void OnWarmupTargetSelected()
         {
             ++_warmupSelectedCount;
@@ -418,13 +299,18 @@ namespace GameResources.Gameplay
             _phase3NextProjectileRequested = true;
         }
 
-        private void OnValidSelection(Transform objTransform, Collider objCollider)
+        private void OnNextProjectileRequested_AppP4()
+        {
+            _phase4TargetRequested = true;
+        }
+
+        private void OnValidSelection(Transform objTransform, Collider objCollider, Vector3 _)
         {
             if (!_triggerPressed && (_collisionLayerMask.value & (1 << objCollider.gameObject.layer)) > 0)
             {
                 var currSelection = objCollider.GetComponent<ProjectileController>();
                 currSelection.HandleSelectionEnter();
-                
+
                 // objCollider.GetComponent<ProjectileController>().ReturnToPool();
                 // OnHit?.Invoke();
                 _triggerPressed = true;
@@ -436,7 +322,7 @@ namespace GameResources.Gameplay
             _triggerPressed = false;
         }
 
-        private void OnValidInteractionStarted(Transform transform, Collider collider)
+        private void OnValidInteractionStarted(Transform transform, Collider collider, Vector3 _)
         {
             var currProj = transform.GetComponent<ProjectileController>();
 
@@ -450,19 +336,18 @@ namespace GameResources.Gameplay
             if (_cachedProjectile_Interaction == null)
                 return;
 
-            if ((Phase == AppPhase.Phase2 || Phase == AppPhase.Phase3 || Phase == AppPhase.Phase4) && !_centeringReticleDespawned)
+            if ((Phase == AppPhase.Phase2 || Phase == AppPhase.Phase3) && !_centeringReticleDespawned)
             {
                 _cachedProjectile_Interaction.HandleInteractionEnter();
             }
-            else if (Phase == AppPhase.Warmup) 
+            else if (Phase == AppPhase.Warmup || Phase == AppPhase.Phase4)
             {
                 _cachedProjectile_Interaction.HandleInteractionEnter();
             }
         }
 
-        private void OnValidInteractionPerformed(Transform transform, Collider collider)
+        private void OnValidInteractionPerformed(Transform transform, Collider collider, Vector3 _)
         {
-            // Debug.Log("Interaction Scripts working");
             
         }
 
@@ -474,6 +359,245 @@ namespace GameResources.Gameplay
             {
                 _cachedProjectile_Interaction.CenteringReticleContracting = false;
             }
+        }
+        #endregion
+
+        #region Spawn Coroutines
+        private IEnumerator SpawnCoroutine_Warmup()
+        {
+            _spawnCount = 0;
+            _warmupSelectedCount = 0;
+
+            int maxCount = _defaultTransforms.Length;
+
+            while (_spawnCount < maxCount)
+            {
+                var currTrnsfrm = _defaultTransforms[_spawnCount];
+
+                ProjectileController item = (ProjectileController)_pool.SpawnItem(currTrnsfrm.position, currTrnsfrm.rotation, InitializeWarmupTarget);
+
+                item.OnWarmupTargetSelected += OnWarmupTargetSelected;
+
+                ++_spawnCount;
+            }
+
+            yield return new WaitUntil(() => _warmupSelectedCount >= maxCount);
+
+            OnWarmupComplete?.Invoke();
+        }
+
+        private IEnumerator SpawnCoroutine_AppP2()
+        {
+            _spawnCount = 0;
+
+            while (_spawnCount < _phase2SpawnCount)
+            {
+                // var angleRad = UnityEngine.Random.Range(0f, 360f).ToRadians();
+                // var radius = UnityEngine.Random.Range(_minSpawnRadius2, _maxSpawnRadius2);
+                var pos = _lookAreaGenerator.GetRandomPointOnMesh();
+                var dir = (pos - _camHMD.position).normalized;
+                pos += (dir * UnityEngine.Random.Range(0f, _maxSpawnDistance));
+
+                // Access the look area handler and use the spawn function
+                // var delay = UnityEngine.Random.Range(_minSpawnDelay, _maxSpawnDelay);
+
+                // yield return new WaitForSecondsRealtime(delay);
+                _spawnCenter.localPosition = Vector3.zero;
+                _spawnCenter.localRotation = Quaternion.identity;
+                _pool.SpawnItem(_spawnCenter.position, _spawnCenter.rotation, InitializeCenteringReticle);
+
+                yield return new WaitUntil(() => _centeringReticleDespawned);
+
+                // spawn on a random location within a radius range and angle range
+                _spawnCenter.position = pos;
+                _spawnCenter.LookAt(_camHMD);
+                _pool.SpawnItem(_spawnCenter.position, _spawnCenter.rotation, InitalizePhase2Projectile);
+                ++_spawnCount;
+
+                _centeringReticleDespawned = false;
+
+                yield return new WaitUntil(() => _phase2ProjectileDespawned);
+
+                _phase2ProjectileDespawned = false;
+            }
+
+            ResetGame(false);
+
+            OnPhase2Complete?.Invoke();
+        }
+
+        private IEnumerator SpawnCoroutine_AppP3()
+        {
+            _spawnCount = 0;
+
+            while (_spawnCount < _bezierSplines.Length)
+            {
+                var currSpline = _bezierSplines[_spawnCount];
+                currSpline.gameObject.SetActive(true);
+
+                _spawnCenter.position = currSpline.GetPoint(0);
+                _pool.SpawnItem(_spawnCenter.position, _spawnCenter.rotation, (item) => { InitializePhase3Projectile(item, currSpline); });
+                ++_spawnCount;
+
+                yield return new WaitUntil(() => _phase3NextProjectileRequested);
+
+                currSpline.gameObject.SetActive(false);
+                _phase3NextProjectileRequested = false;
+            }
+
+            ResetGame(false);
+
+            OnPhase3Complete?.Invoke();
+            OnEnablePhase3NextButton?.Invoke();
+        }
+
+        private IEnumerator SpawnCoroutine_AppP4()
+        {
+            for (int i = 0; i < _phase4TargetSpawnCount; i++)
+            {
+                _spawnCenter.localPosition = Vector3.zero;
+                _spawnCenter.localRotation = Quaternion.identity;
+                _pool.SpawnItem(_spawnCenter.position, _spawnCenter.rotation, InitializeCenteringReticle);
+
+                yield return new WaitUntil(() => _centeringReticleDespawned);
+
+                var pos = _lookAreaGenerator.GetEdgePoint(i);
+                _pool.SpawnItem(pos, Quaternion.identity, InitializePhase4Target);
+
+                yield return new WaitUntil(() => _phase4TargetDespawned);
+
+                BlackoutScreenHandler.Instance.SetBlackoutScreen(true, P4_BLACKOUT_TEXT);
+                _lookAreaGenerator.SetMeshInteraction(true);
+
+                yield return new WaitUntil(() => _phase4HeadRecentered);
+
+                _lookAreaGenerator.DisplayTargetDistanceFromOrigin_AppP4();
+                _lookAreaGenerator.SetMeshInteraction(false);
+
+                BlackoutScreenHandler.Instance.SetBlackoutScreen(false);
+                OnEnablePhase4NextButton?.Invoke();
+
+                // Display the current position of the head pointer on the look area with respect to the "true center"
+
+                yield return new WaitUntil(() => _phase4TargetRequested);
+
+                _lookAreaGenerator.ClearDisplay_AppP4();
+                _centeringReticleDespawned = false;
+                _phase4TargetRequested = false;
+                _phase4TargetDespawned = false;
+                _phase4HeadRecentered = false;
+            }
+
+
+            ResetGame(false);
+            
+            OnPhase4Complete?.Invoke();
+            OnEnablePhase4NextButton?.Invoke();
+        }
+        #endregion
+
+        #region Private Methods
+        private IEnumerator WaitForInputSystem()
+        {
+            yield return new WaitUntil(() => InputManager.IsInstantiated);
+
+            InputManager.InputActions.XRIRightHandInteraction.Select.performed += RightGripPressed;
+
+            _inputsAssigned = true;
+        }
+
+        private void InitializeWarmupTarget(PooledItem item)
+        {
+            var res = (ProjectileController)item;
+
+            res.InitializeItem(ProjectileMode.WarmupTarget);
+        }
+
+        private void InitializeCenteringReticle(PooledItem item)
+        {
+            var res = (ProjectileController) item;
+
+            res.InitializeItem(ProjectileMode.CenteringReticle);
+            res.OnCenteringReticleDespawned += () => { _centeringReticleDespawned = true; };
+        }
+
+        private void InitalizePhase2Projectile(PooledItem item)
+        {
+            var res = (ProjectileController) item;
+
+            res.InitializeItem(ProjectileMode.Phase2Projectile);
+        }
+
+        private void InitializePhase3Projectile(PooledItem item, BezierSpline spline)
+        {
+            var res = (ProjectileController) item;
+
+            res.InitializeItem(ProjectileMode.Phase3Projectile);
+            res.InjectSpline(spline);
+        }
+
+        private void InitializePhase4Target(PooledItem item)
+        {
+            var res = (ProjectileController)item;
+
+            res.InitializeItem(ProjectileMode.Phase4Target);
+
+            res.OnPhase4TargetDespawned += () =>
+            {
+                _phase4TargetDespawned = true;
+            };
+        }
+
+        private void ResetGame(bool hardRest = true)
+        {
+            if (_spawnCoroutine != null)
+            {
+                StopCoroutine(_spawnCoroutine);
+                _spawnCoroutine = null;
+            }
+
+            if (_cachedProjectile_Interaction != null)
+            {
+                _cachedProjectile_Interaction.ReturnToPool();
+                _cachedProjectile_Interaction = null;
+            }
+
+            _phase = 0;
+
+            _triggerPressed = false;
+            _inputsAssigned = false;
+            _centeringReticleDespawned = false;
+            _phase2ProjectileDespawned = false;
+            _phase4TargetRequested = false;
+            _phase3NextProjectileRequested = false;
+            _phase4TargetDespawned = false;
+            _phase4HeadRecentered = false;
+
+            _spawnCenter.localPosition = _defaultSpawnPosition;
+            _spawnCenter.rotation = _defaultSpawnRotation;
+
+            _interactionPanel_AppP3.DeInitializePanel();
+
+            if (hardRest)
+            {
+                _gameSetWarmup.SetActive(false);
+                _gameSetPhase2and4.SetActive(false);
+                _gameSetPhase3.SetActive(false);
+
+                foreach (var item in _bezierSplines)
+                {
+                    item.gameObject.SetActive(false);
+                }
+
+                _lookAreaGenerator.RestrictLookAreaModification();
+                _lookAreaGenerator.gameObject.SetActive(false);
+
+                _dataHandler.ResetMetrics();
+            }
+
+            _pool.CleanPool();
+            _spawnCount = 0;
+            _warmupSelectedCount = 0;
         }
         #endregion
     }

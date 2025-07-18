@@ -2,18 +2,18 @@ using CoreResources.Managers.InputManagement;
 using CoreResources.Singleton;
 using GameResources.Gameplay;
 using GameResources.Gameplay.VRController;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
+using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace CoreResources.Utils
 {
     [RequireComponent(typeof(MeshFilter))]
     public class LookAreaGenerator : DestroyableMonoSingleton<LookAreaGenerator>
     {
-        [SerializeField] private Transform _camHMD;
+        [SerializeField] private Transform _camHMD, _centerPos;
+        [SerializeField] private GameObject _interactionPanel, _appP4TextBox;
+        [SerializeField] private TextMeshProUGUI _appP4Text;
         [SerializeField] private List<Transform> _points = new List<Transform>(8);
         [SerializeField] private float _cornerRadius = 0.1f;
         [SerializeField] private int _cornerResolution = 4;
@@ -23,7 +23,7 @@ namespace CoreResources.Utils
 
         [Header("Materials")]
         [SerializeField] private Material _fillMaterial;
-        [SerializeField] private Material _borderMaterial;
+        [SerializeField] private Material _borderMaterial, _lineMaterial;
 
         [Header("Meshes")]
         [SerializeField] private MeshFilter _fillMeshFilter;
@@ -31,14 +31,26 @@ namespace CoreResources.Utils
         [SerializeField] private MeshFilter _borderMeshFilter;
         [SerializeField] private MeshRenderer _borderMeshRenderer;
 
+        [Header("Gizmo Settings")]
+        [SerializeField] private float _lineThickness = 0.01f;
+        [SerializeField] private float _gizmoCircleRadius = 0.05f;
+
         private Mesh _fillMesh;
         private Mesh _borderMesh;
+
+        private GameObject _originMarker;
+        private GameObject _targetMarker;
+        private GameObject _connectionLine;
 
         // Handling user input for handling movement
         private bool _lookAreaModificationAllowed = false;
         private bool _triggerPressed = false;
         private List<LookAreaInteractable> _interactables = new List<LookAreaInteractable>();
         private LookAreaInteractable _currentInteractable = null;
+        private InteractionPanel _interactionPanelScript;
+        private Vector3 _appP4LastHitPosition = Vector3.zero;
+
+        public Vector3 AppP4LastHitPosition { get { return _appP4LastHitPosition; } }
 
         #region Overrides
         public override void OnInit()
@@ -52,6 +64,14 @@ namespace CoreResources.Utils
                     currItem.InitializeInteractable();
                 }
             }
+
+            if (_interactionPanelScript == null)
+                _interactionPanelScript = _interactionPanel.GetComponentInChildren<InteractionPanel>();
+            
+            _interactionPanelScript.InitializePanel();
+            _appP4TextBox.SetActive(false);
+            _interactionPanel.SetActive(false);
+            _appP4LastHitPosition = Vector3.zero;
         }
 
         public override void OnDeInit()
@@ -116,6 +136,72 @@ namespace CoreResources.Utils
                 CursorHandler.Instance.OnValidSelection -= OnValidSelection;
             
             _lookAreaModificationAllowed = false;
+        }
+
+        public void SetMeshInteraction(bool status)
+        {
+            if (status)
+            {
+                _interactionPanel.SetActive(true);
+                _interactionPanelScript.InitializePanel();
+
+                if (CursorHandler.IsInstantiated)
+                    CursorHandler.Instance.OnValidInteractionPerformed += OnValidInteraction;
+            }
+            else
+            {
+                _interactionPanelScript.DeInitializePanel();
+                _interactionPanel.SetActive(false);
+
+                if (CursorHandler.IsInstantiated)
+                    CursorHandler.Instance.OnValidInteractionPerformed -= OnValidInteraction;
+
+                _appP4LastHitPosition = Vector3.zero;
+            }
+        }
+
+        public void DisplayTargetDistanceFromOrigin_AppP4()
+        {
+            ClearDisplay_AppP4();
+
+            Vector3 position = _appP4LastHitPosition;
+            Vector3 origin = _centerPos.position;
+            Vector3 displacement = position - origin;
+
+            if (!_originMarker) _originMarker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            _originMarker.transform.position = origin;
+            _originMarker.transform.localScale = Vector3.one * _gizmoCircleRadius;
+            _originMarker.GetComponent<Renderer>().material = _lineMaterial;
+
+            if (!_targetMarker) _targetMarker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            _targetMarker.transform.position = position;
+            _targetMarker.transform.localScale = Vector3.one * _gizmoCircleRadius;
+            _targetMarker.GetComponent<Renderer>().material = _lineMaterial;
+
+            if (!_connectionLine) _connectionLine = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            Vector3 midPoint = (origin + position) / 2f;
+            _connectionLine.transform.position = midPoint;
+            _connectionLine.transform.up = (position - origin).normalized;
+            float distance = displacement.magnitude;
+            _connectionLine.transform.localScale = new Vector3(_lineThickness, distance / 2f, _lineThickness);
+            _connectionLine.GetComponent<Renderer>().material = _lineMaterial;
+
+            _appP4Text.text = $"Displacement: {displacement}\nDistance: {distance}";
+
+            _appP4TextBox.SetActive(true);
+            _originMarker.SetActive(true);
+            _targetMarker.SetActive(true);
+            _connectionLine.SetActive(true);
+        }
+
+        public void ClearDisplay_AppP4()
+        {
+            if (_originMarker) _originMarker.SetActive(false);
+            if (_targetMarker) _targetMarker.SetActive(false);
+            if (_connectionLine) _connectionLine.SetActive(false);
+
+            _appP4Text.text = string.Empty;
+            _appP4TextBox.SetActive(false);
         }
         #endregion
 
@@ -266,6 +352,24 @@ namespace CoreResources.Utils
             return pos;
         }
 
+        /// <summary>
+        /// Get a point on the edge of the look area
+        /// </summary>
+        /// <param name="index">
+        /// Index of the edge
+        /// </param>
+        /// <returns></returns>
+        public Vector3 GetEdgePoint(int index)
+        {
+            if (index < 0 || index >= _interactables.Count)
+            {
+                UnityEngine.Debug.LogError("Index out of bounds");
+                return Vector3.zero;
+            }
+
+            return _interactables[index].transform.position;
+        }
+
         private Vector3 Bezier(Vector3 a, Vector3 b, Vector3 c, float t)
         {
             // Quadratic Bezier curve
@@ -282,18 +386,8 @@ namespace CoreResources.Utils
             return point;
         }
 
-        private IEnumerator Test_RandomSpawnPoints()
-        {
-            while (true)
-            {
-                yield return new WaitForSeconds(2.5f);
-                var pos = GetRandomPointOnMesh();
-                _spawnPos.position = pos;
-            }
-        }
-
         #region Event Listeners
-        private void OnValidSelection(Transform objTransform, Collider objCollider)
+        private void OnValidSelection(Transform objTransform, Collider objCollider, Vector3 _)
         {
             var interactable = objCollider.GetComponent<LookAreaInteractable>();
             if (interactable != null)
@@ -301,6 +395,14 @@ namespace CoreResources.Utils
                 _currentInteractable = interactable;
                 _currentInteractable.SetHighlight(true);
                 _triggerPressed = true;
+            }
+        }
+
+        private void OnValidInteraction(Transform objTransform, Collider objCollider, Vector3 hitPosition)
+        {
+            if (GameplayHandler.Instance.Phase == AppPhase.Phase4)
+            {
+                _appP4LastHitPosition = hitPosition;
             }
         }
         #endregion

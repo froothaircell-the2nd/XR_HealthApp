@@ -71,10 +71,10 @@ namespace GameResources.Gameplay.VRController
         #endregion
 
         #region Events
-        public Action<Transform, Collider> OnValidInteractionStarted;
-        public Action<Transform, Collider> OnValidInteractionPerformed;
+        public Action<Transform, Collider, Vector3> OnValidInteractionStarted;
+        public Action<Transform, Collider, Vector3> OnValidInteractionPerformed;
         public Action OnValidInteractionCancelled;
-        public Action<Transform, Collider> OnValidSelection;
+        public Action<Transform, Collider, Vector3> OnValidSelection;
         public Action OnValidCancellation;
         #endregion
 
@@ -134,6 +134,12 @@ namespace GameResources.Gameplay.VRController
                 InputManager.InputActions.XRILeftHandInteraction.UIPress.performed -= OnSelectPerformed;
                 InputManager.InputActions.XRILeftHandInteraction.UIPress.canceled -= OnSelectCancelled;
             }
+
+            OnValidInteractionStarted = null;
+            OnValidInteractionPerformed = null;
+            OnValidSelection = null;
+            OnValidInteractionCancelled = null;
+            OnValidCancellation = null;
 
             DisableCursorInteraction();
         }
@@ -209,6 +215,7 @@ namespace GameResources.Gameplay.VRController
                 {
                     var collider = hit.collider;
                     var trnsfrm = hit.transform;
+                    var hitPos = hit.point;
 
                     if (collider != null && !collider.gameObject.GetComponent<ICursorInteractable>().IsInteractable)
                         continue;
@@ -223,14 +230,19 @@ namespace GameResources.Gameplay.VRController
                                 _cachedTargetSelectTransform = trnsfrm; // cache for future use (but only if the original cache is clean
                                 _cachedTargetSelectCollider = collider;
                             }
+                            else
+                            {
+                                hitPos = Vector3.zero;
+                            }
 
-                            OnValidSelection?.Invoke(_cachedTargetSelectTransform, _cachedTargetSelectCollider);
+                            OnValidSelection?.Invoke(_cachedTargetSelectTransform, _cachedTargetSelectCollider, hitPos);
 
                             ResizeCursor(hit, pos, rot);
                             continue;
                         }
 
-                        OnValidSelection?.Invoke(_cachedTargetSelectTransform, _cachedTargetSelectCollider);
+                        hitPos = Vector3.zero;
+                        OnValidSelection?.Invoke(_cachedTargetSelectTransform, _cachedTargetSelectCollider, hitPos);
                         ResizeCursor(_cachedTargetSelectTransform, pos, rot); // run with the cached transform instead
                         continue;
                     }
@@ -244,12 +256,12 @@ namespace GameResources.Gameplay.VRController
                         _cachedTargetInteractTransform = trnsfrm;
                         _cachedTargetInteractCollider = collider;
 
-                        OnValidInteractionStarted?.Invoke(_cachedTargetInteractTransform, _cachedTargetInteractCollider);
+                        OnValidInteractionStarted?.Invoke(_cachedTargetInteractTransform, _cachedTargetInteractCollider, hitPos);
                         _interactionStarted = true;
                     }
 
                     if (CursorMode == CursorMode.Interacting && _interactionStarted)
-                        OnValidInteractionPerformed?.Invoke(_cachedTargetInteractTransform, _cachedTargetInteractCollider);
+                        OnValidInteractionPerformed?.Invoke(_cachedTargetInteractTransform, _cachedTargetInteractCollider, hitPos);
 
                     CursorMode = CursorMode.Interacting;
                     continue;
