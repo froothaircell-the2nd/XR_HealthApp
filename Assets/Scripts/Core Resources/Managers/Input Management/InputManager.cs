@@ -122,6 +122,13 @@ namespace CoreResources.Managers.InputManagement
             if (!_eventSystem)
                 throw new MissingReferenceException($"Event System Component Doesnt exist!");
 
+            if (EventSystem.current.gameObject != _eventSystem.gameObject)
+            {
+                var duplicate = EventSystem.current.gameObject;
+                EventSystem.current = _eventSystem;
+                Destroy(duplicate);
+            }
+
             InitIMEManager();
 
             m_inputDevices = new List<InputDevice>(InputSystem.devices);

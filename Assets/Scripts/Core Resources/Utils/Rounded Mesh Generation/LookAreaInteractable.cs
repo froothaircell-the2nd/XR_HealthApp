@@ -14,8 +14,9 @@ namespace CoreResources.Utils
         [SerializeField]
         private float minDistance = 0.5f, maxDistance = 2f;
 
+        private Transform _centerTransform;
         private Vector3 _direction; // Should be normalized
-        private Vector3 _center = Vector3.zero;
+        // private Vector3 _center = Vector3.zero;
         private Vector3 _defaultScale = Vector3.zero;
         private float _resizeDuration = 0.65f;
         private Renderer _renderer;
@@ -29,14 +30,20 @@ namespace CoreResources.Utils
             private set => _isInteractable = value;
         }
 
-        public void InitializeInteractable()
+        public void InitializeInteractable(Transform centerTrans)
+        {
+            CalibrateInteractable();
+            
+            _renderer = GetComponent<Renderer>();
+            _defaultColor = _renderer.material.GetColor("_EmissionColor");
+            _centerTransform = centerTrans; // or assign a central point if different
+            _collider = GetComponent<Collider>();
+        }
+
+        public void CalibrateInteractable()
         {
             _direction = transform.right.normalized;
             _defaultScale = transform.localScale;
-            _renderer = GetComponent<Renderer>();
-            _defaultColor = _renderer.material.GetColor("_EmissionColor");
-            _center = Vector3.zero; // or assign a central point if different
-            _collider = GetComponent<Collider>();
         }
 
         public void EnableInteraction()
@@ -66,10 +73,13 @@ namespace CoreResources.Utils
         {
             if (_isInteractable)
             {
-                Vector3 local = position - _center;
+                var center = _centerTransform.position;
+                Vector3 local = position - center;
                 float projection = Vector3.Dot(local, _direction);
                 float clampedDistance = Mathf.Clamp(projection, minDistance, maxDistance);
-                transform.localPosition = _center + _direction * clampedDistance;
+                Debug.LogError($"Center: {center}, Local: {local}, Projection: {projection}, Clamped Distance: {clampedDistance}");
+
+                transform.position = center + _direction * clampedDistance;
             }
         }
     }

@@ -61,7 +61,7 @@ namespace CoreResources.Utils
                 {
                     var currItem = _points[i].GetComponent<LookAreaInteractable>();
                     _interactables.Add(currItem);
-                    currItem.InitializeInteractable();
+                    currItem.InitializeInteractable(_centerPos);
                 }
             }
 
@@ -90,6 +90,12 @@ namespace CoreResources.Utils
         }
 
         #region Public Methods
+        public void RecalibrateInteractables()
+        {
+            foreach (var interactable in _interactables)
+                interactable.CalibrateInteractable();
+        }
+
         public void GenerateMeshes()
         {
             if (_points.Count < 3)

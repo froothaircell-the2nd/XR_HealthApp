@@ -1,5 +1,6 @@
 using CoreResources.Singleton;
 using DG.Tweening;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,6 +24,8 @@ namespace GameResources.Gameplay.VRController
         private Color _transparentTextColor;
         private CanvasGroup _canvasGroup;
 
+        private const string LOADING_TEXT = "Loading...";
+
         #region Overrides
         public override void OnInit()
         {
@@ -36,7 +39,8 @@ namespace GameResources.Gameplay.VRController
 
             _blackScreen.color = _defaultImageColor;
             _blackScreenText.color = _defaultTextColor;
-            _blackScreenText.text = "Loading...";
+
+            SetBlackoutScreen(true, "Please center the head position and press the grip button.");
 
             _canvasGroup = GetComponent<CanvasGroup>();
             _canvasGroup.blocksRaycasts = false;

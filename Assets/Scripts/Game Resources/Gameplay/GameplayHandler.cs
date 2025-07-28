@@ -168,15 +168,20 @@ namespace GameResources.Gameplay
         {
             // Set Positions of relevant 
             Vector3 forward = _camHMD.forward;
-            Vector3 origin = _camHMD.position;
+            _camHMD.GetPositionAndRotation(out Vector3 origin, out Quaternion rotation);
             Vector3 finalPosition = origin + forward * _appCalibrationDistance;
 
             _gameSetWarmup.transform.position = finalPosition;
+            _gameSetPhase2.transform.rotation = rotation;
             _lookAreaGenerator.transform.position = finalPosition;
+            _lookAreaGenerator.transform.rotation = rotation;
+            _lookAreaGenerator.RecalibrateInteractables();
             _gameSetPhase2.transform.position = finalPosition;
+            _gameSetPhase2.transform.rotation = rotation;
             _gameSetPhase3.transform.position = finalPosition;
+            _gameSetPhase3.transform.rotation = rotation;
 
-            UIMediator.Instance.SetMenuPositions(_camHMD, forward, origin);
+            UIMediator.Instance.SetMenuPositions(_camHMD, origin, forward, rotation);
         }
         #endregion
 

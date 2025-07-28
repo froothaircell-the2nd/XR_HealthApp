@@ -41,7 +41,7 @@ MonoBehaviour:
   renderThreadPriority: -2
   jobWorkerThreadPriority: 0
   debugLogFlagForNative: 0
-  debugLogFlagForUnity: 16
+  debugLogFlagForUnity: 0
   overrideLogFlagForNative: 0
   useCMPChecker: 0
   amcMode: 0

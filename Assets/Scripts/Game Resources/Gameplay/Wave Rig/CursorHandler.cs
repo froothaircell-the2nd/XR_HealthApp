@@ -20,7 +20,7 @@ namespace GameResources.Gameplay.VRController
     {
         Default = 0,
         Interacting = 1,
-        Selected = 2,
+        Selecting = 2,
     }
 
     public class CursorHandler : DestroyableMonoSingleton<CursorHandler>
@@ -104,7 +104,7 @@ namespace GameResources.Gameplay.VRController
                             _cursorImage.sprite = _interactableSprite;
 
                             break;
-                        case CursorMode.Selected:
+                        case CursorMode.Selecting:
                             if (_selectionSpriteModificationEnabled)
                                 _cursorImage.sprite = _selectedSprite;
                             break;
@@ -209,9 +209,9 @@ namespace GameResources.Gameplay.VRController
                 var rot = _mainCamera.transform.forward;
 
                 var raycastHitValid = Physics.SphereCast(pos, _spherecastRadius, rot, out RaycastHit hit, _maxRaycastRange, _targetLayer);
-                
+
                 // Check if the raycast its an interactable object
-                if (raycastHitValid || CursorMode == CursorMode.Selected)
+                if (raycastHitValid || CursorMode == CursorMode.Selecting)
                 {
                     var collider = hit.collider;
                     var trnsfrm = hit.transform;
@@ -221,7 +221,7 @@ namespace GameResources.Gameplay.VRController
                         continue;
 
                     // In selection state
-                    if (CursorMode == CursorMode.Selected)
+                    if (CursorMode == CursorMode.Selecting)
                     {
                         if (raycastHitValid)
                         {
@@ -235,12 +235,14 @@ namespace GameResources.Gameplay.VRController
                                 hitPos = Vector3.zero;
                             }
 
+                            // Debug.LogError($"On Valid Selection with a valid raycast. Curr obj: {_cachedTargetSelectCollider.gameObject.name}");
                             OnValidSelection?.Invoke(_cachedTargetSelectTransform, _cachedTargetSelectCollider, hitPos);
 
                             ResizeCursor(hit, pos, rot);
                             continue;
                         }
 
+                        // Debug.LogError($"On Valid Selection with an invalid raycast. Curr obj: {_cachedTargetSelectCollider.gameObject.name}");
                         hitPos = Vector3.zero;
                         OnValidSelection?.Invoke(_cachedTargetSelectTransform, _cachedTargetSelectCollider, hitPos);
                         ResizeCursor(_cachedTargetSelectTransform, pos, rot); // run with the cached transform instead
@@ -250,7 +252,7 @@ namespace GameResources.Gameplay.VRController
                     // In interaction state
                     ResetCursorDimensions();
 
-                    if ((CursorMode == CursorMode.Selected || CursorMode == CursorMode.Interacting) || 
+                    if (CursorMode == CursorMode.Interacting || 
                         (trnsfrm != _cachedTargetInteractTransform && collider != _cachedTargetInteractCollider))
                     {
                         _cachedTargetInteractTransform = trnsfrm;
@@ -347,15 +349,17 @@ namespace GameResources.Gameplay.VRController
         {
             if (CursorMode == CursorMode.Interacting && _selectionEnabled) // can only select when we get interactable objects in range
             {
-                CursorMode = CursorMode.Selected;
+                Debug.LogError("Select Performed");
+                CursorMode = CursorMode.Selecting;
             }
         }
 
         private void OnSelectCancelled(InputAction.CallbackContext obj)
         {
-            if (CursorMode == CursorMode.Selected && _selectionEnabled)
+            if (CursorMode == CursorMode.Selecting && _selectionEnabled)
             {
-                CursorMode = CursorMode.Interacting;
+                Debug.LogError("Select Cancelled");
+                CursorMode = CursorMode.Default;
                 _cachedTargetSelectTransform = null;
                 _cachedTargetSelectCollider = null;
 

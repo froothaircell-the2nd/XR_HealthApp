@@ -799,7 +799,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 127905902}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Spawn Points
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -900,7 +900,7 @@ GameObject:
   - component: {fileID: 141983489}
   - component: {fileID: 141983487}
   - component: {fileID: 141983490}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Border Mesh
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3209,7 +3209,7 @@ GameObject:
   - component: {fileID: 578219536}
   - component: {fileID: 578219535}
   - component: {fileID: 578219534}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: Raycast Target Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5570,13 +5570,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 968386212}
-  m_Layer: 10
+  m_Layer: 0
   m_Name: CenterPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &968386212
 Transform:
   m_ObjectHideFlags: 0
@@ -7155,14 +7155,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7355358310983813835, guid: 73d680c6fe00f2c4b9cc8785619ff823, type: 3}
-      propertyPath: m_Name
-      value: Black Screen Handler
-      objectReference: {fileID: 0}
-    - target: {fileID: 7355358310983813835, guid: 73d680c6fe00f2c4b9cc8785619ff823, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7780,7 +7772,7 @@ MonoBehaviour:
   _spawnPos: {fileID: 968386212}
   _borderThickness: 0.1
   _maxRaycastDistance: 50
-  _spherecastRadius: 1
+  _spherecastRadius: 0.5
   _collisionLayerMask:
     serializedVersion: 2
     m_Bits: 1536
@@ -10439,9 +10431,9 @@ Transform:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 1390696264}
   - {fileID: 418714224}
   - {fileID: 1656891162}
   - {fileID: 1459701939}
   - {fileID: 1326991479}
   - {fileID: 6056412}
-  - {fileID: 1390696264}

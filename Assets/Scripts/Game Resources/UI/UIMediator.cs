@@ -50,13 +50,14 @@ namespace GameResources.UI
         #endregion
 
         #region Public Methods
-        public void SetMenuPositions(Transform cameraTransform, Vector3 origin, Vector3 forward)
+        public void SetMenuPositions(Transform cameraTransform, Vector3 origin, Vector3 forward, Quaternion rotation)
         {
             Vector3 finalPosition = origin + forward * _appCalibrationDistance;
 
             foreach (UIViewManager manager in _viewManagers)
             {
                 manager.transform.position = finalPosition;
+                manager.transform.rotation = rotation;
             }
         }
 

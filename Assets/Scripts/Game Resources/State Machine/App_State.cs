@@ -16,13 +16,6 @@ namespace GameResources.StateMachine
     {
         public override void OnEnter()
         {
-            if (!BlackoutScreenHandler.IsInstantiated)
-            {
-                Debug.LogError("Blackout Screen not instantiated!");
-                return;
-            }
-
-            BlackoutScreenHandler.Instance.SetBlackoutScreen(true, "Please center the head position and press the grip button.");
             InputManager.InputActions.XRIRightHandInteraction.Select.performed += OnCalibrationComplete;
         }
 
@@ -40,6 +33,12 @@ namespace GameResources.StateMachine
 
         private void OnCalibrationComplete(InputAction.CallbackContext obj)
         {
+            if (!BlackoutScreenHandler.IsInstantiated)
+            {
+                Debug.LogError("Blackout Screen not instantiated!");
+                return;
+            }
+
             GameplayHandler.Instance.CalibrateSceneToCameraOrientation();
             App_StateMachineMediator.Instance.GoToMenu();
         }
