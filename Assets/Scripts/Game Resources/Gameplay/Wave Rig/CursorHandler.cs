@@ -57,8 +57,7 @@ namespace GameResources.Gameplay.VRController
         private bool _interactionEnabled = false,
             _selectionEnabled = false,
             _selectionSpriteModificationEnabled = false,
-            _inputsAssigned = false,
-            _interactionStarted = false;
+            _inputsAssigned = false;
         private Vector2 _defaultCursorSize;
 
         private CursorRefreshMode _refreshMode = CursorRefreshMode.FixedTime;
@@ -74,8 +73,8 @@ namespace GameResources.Gameplay.VRController
         public Action<Transform, Collider, Vector3> OnValidInteractionStarted;
         public Action<Transform, Collider, Vector3> OnValidInteractionPerformed;
         public Action OnValidInteractionCancelled;
-        public Action<Transform, Collider, Vector3> OnValidSelection;
-        public Action OnValidCancellation;
+        public Action<Transform, Collider> OnValidSelectionPerformed;
+        public Action OnValidSelectionCancelled;
         #endregion
 
         #region Public Properties
@@ -131,15 +130,15 @@ namespace GameResources.Gameplay.VRController
 
             if (InputManager.IsInstantiated && _inputsAssigned)
             {
-                InputManager.InputActions.XRILeftHandInteraction.UIPress.performed -= OnSelectPerformed;
+                InputManager.InputActions.XRILeftHandInteraction.UIPress.performed -= OnSelectStarted;
                 InputManager.InputActions.XRILeftHandInteraction.UIPress.canceled -= OnSelectCancelled;
             }
 
             OnValidInteractionStarted = null;
             OnValidInteractionPerformed = null;
-            OnValidSelection = null;
+            OnValidSelectionPerformed = null;
             OnValidInteractionCancelled = null;
-            OnValidCancellation = null;
+            OnValidSelectionCancelled = null;
 
             DisableCursorInteraction();
         }
@@ -165,7 +164,6 @@ namespace GameResources.Gameplay.VRController
         {
             _interactionEnabled = false;
             _selectionEnabled = false;
-            _interactionStarted = false;
 
             if (_cursorRefreshCoroutine != null)
             {
@@ -180,7 +178,7 @@ namespace GameResources.Gameplay.VRController
         {
             yield return new WaitUntil(() => InputManager.IsInstantiated);
 
-            InputManager.InputActions.XRILeftHandInteraction.UIPress.performed += OnSelectPerformed;
+            InputManager.InputActions.XRILeftHandInteraction.UIPress.performed += OnSelectStarted;
             InputManager.InputActions.XRILeftHandInteraction.UIPress.canceled += OnSelectCancelled;
 
             _inputsAssigned = true;
@@ -210,75 +208,82 @@ namespace GameResources.Gameplay.VRController
 
                 var raycastHitValid = Physics.SphereCast(pos, _spherecastRadius, rot, out RaycastHit hit, _maxRaycastRange, _targetLayer);
 
-                // Check if the raycast its an interactable object
-                if (raycastHitValid || CursorMode == CursorMode.Selecting)
+                Collider collider = null;
+                Transform trnsfrm = null;
+                Vector3 hitPos = default;
+
+                if (raycastHitValid)
                 {
-                    var collider = hit.collider;
-                    var trnsfrm = hit.transform;
-                    var hitPos = hit.point;
-
-                    if (collider != null && !collider.gameObject.GetComponent<ICursorInteractable>().IsInteractable)
-                        continue;
-
-                    // In selection state
-                    if (CursorMode == CursorMode.Selecting)
-                    {
-                        if (raycastHitValid)
-                        {
-                            if (_cachedTargetSelectTransform == null && _cachedTargetSelectCollider == null)
-                            {
-                                _cachedTargetSelectTransform = trnsfrm; // cache for future use (but only if the original cache is clean
-                                _cachedTargetSelectCollider = collider;
-                            }
-                            else
-                            {
-                                hitPos = Vector3.zero;
-                            }
-
-                            // Debug.LogError($"On Valid Selection with a valid raycast. Curr obj: {_cachedTargetSelectCollider.gameObject.name}");
-                            OnValidSelection?.Invoke(_cachedTargetSelectTransform, _cachedTargetSelectCollider, hitPos);
-
-                            ResizeCursor(hit, pos, rot);
-                            continue;
-                        }
-
-                        // Debug.LogError($"On Valid Selection with an invalid raycast. Curr obj: {_cachedTargetSelectCollider.gameObject.name}");
-                        hitPos = Vector3.zero;
-                        OnValidSelection?.Invoke(_cachedTargetSelectTransform, _cachedTargetSelectCollider, hitPos);
-                        ResizeCursor(_cachedTargetSelectTransform, pos, rot); // run with the cached transform instead
-                        continue;
-                    }
-
-                    // In interaction state
-                    ResetCursorDimensions();
-
-                    if (CursorMode == CursorMode.Interacting || 
-                        (trnsfrm != _cachedTargetInteractTransform && collider != _cachedTargetInteractCollider))
-                    {
-                        _cachedTargetInteractTransform = trnsfrm;
-                        _cachedTargetInteractCollider = collider;
-
-                        OnValidInteractionStarted?.Invoke(_cachedTargetInteractTransform, _cachedTargetInteractCollider, hitPos);
-                        _interactionStarted = true;
-                    }
-
-                    if (CursorMode == CursorMode.Interacting && _interactionStarted)
-                        OnValidInteractionPerformed?.Invoke(_cachedTargetInteractTransform, _cachedTargetInteractCollider, hitPos);
-
-                    CursorMode = CursorMode.Interacting;
-                    continue;
+                    collider = hit.collider;
+                    trnsfrm = hit.transform;
+                    hitPos = hit.point;
                 }
 
-                ResetCursorDimensions();
-                CursorMode = CursorMode.Default;
-
-                if (_interactionStarted)
+                switch (CursorMode)
                 {
-                    OnValidInteractionCancelled?.Invoke();
-                    _interactionStarted = false;
+                    case CursorMode.Default:
+                        if (raycastHitValid)
+                        {
+                            CursorMode = CursorMode.Interacting;
 
-                    _cachedTargetInteractTransform = null;
-                    _cachedTargetInteractCollider = null;
+                            _cachedTargetInteractTransform = trnsfrm;
+                            _cachedTargetInteractCollider = collider;
+
+                            OnValidInteractionStarted?.Invoke(
+                                _cachedTargetInteractTransform, 
+                                _cachedTargetInteractCollider, 
+                                hitPos);
+                        }
+                        break;
+                    case CursorMode.Interacting:
+                        if (raycastHitValid)
+                        {
+                            // Hovered on to a new object, start interaction process again
+                            if (_cachedTargetInteractTransform != trnsfrm || _cachedTargetInteractCollider != collider)
+                            {
+                                _cachedTargetInteractTransform = trnsfrm;
+                                _cachedTargetInteractCollider = collider;
+
+                                OnValidInteractionStarted?.Invoke(
+                                    _cachedTargetInteractTransform, 
+                                    _cachedTargetInteractCollider, 
+                                    hitPos);
+                            }
+                            // On the same object, continue interaction
+                            else
+                            {
+                                OnValidInteractionPerformed?.Invoke(
+                                    _cachedTargetInteractTransform, 
+                                    _cachedTargetInteractCollider, 
+                                    hitPos);
+                            }
+                        }
+                        // Interaction cancels if the raycast is invalid
+                        else
+                        {
+                            CursorMode = CursorMode.Default;
+
+                            OnValidInteractionCancelled?.Invoke();
+
+                            _cachedTargetInteractTransform = null;
+                            _cachedTargetInteractCollider = null;
+                        }
+                        break;
+                    case CursorMode.Selecting:
+                        // Make sure no new target overrides the current transform and collider
+                        if (_cachedTargetSelectTransform == null && _cachedTargetSelectCollider == null)
+                        {
+                            _cachedTargetSelectTransform = trnsfrm; // cache for future use (but only if the original cache is clean
+                            _cachedTargetSelectCollider = collider;
+                        }
+
+                        OnValidSelectionPerformed?.Invoke(
+                            _cachedTargetSelectTransform, 
+                            _cachedTargetSelectCollider);
+
+                        ResizeCursor(_cachedTargetSelectTransform, pos, rot); // run with the cached transform instead
+                        
+                        break;
                 }
             }
 
@@ -345,7 +350,7 @@ namespace GameResources.Gameplay.VRController
         #endregion
         
         #region Event Listeners
-        private void OnSelectPerformed(InputAction.CallbackContext obj)
+        private void OnSelectStarted(InputAction.CallbackContext obj)
         {
             if (CursorMode == CursorMode.Interacting && _selectionEnabled) // can only select when we get interactable objects in range
             {
@@ -359,11 +364,14 @@ namespace GameResources.Gameplay.VRController
             if (CursorMode == CursorMode.Selecting && _selectionEnabled)
             {
                 Debug.LogError("Select Cancelled");
+
+                ResetCursorDimensions();
+                
                 CursorMode = CursorMode.Default;
                 _cachedTargetSelectTransform = null;
                 _cachedTargetSelectCollider = null;
 
-                OnValidCancellation?.Invoke();
+                OnValidSelectionCancelled?.Invoke();
             }
         }
         #endregion

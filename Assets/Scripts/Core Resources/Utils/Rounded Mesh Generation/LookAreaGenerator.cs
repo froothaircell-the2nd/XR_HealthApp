@@ -128,7 +128,12 @@ namespace CoreResources.Utils
             }
 
             _lookAreaModificationAllowed = true;
-            CursorHandler.Instance.OnValidSelection += OnValidSelection;
+
+            if (CursorHandler.IsInstantiated)
+            {
+                CursorHandler.Instance.OnValidSelectionPerformed += OnValidSelectionPerformed;
+                CursorHandler.Instance.OnValidSelectionCancelled += OnValidSelectionCancelled;
+            }
         }
 
         public void RestrictLookAreaModification()
@@ -139,7 +144,10 @@ namespace CoreResources.Utils
             }
 
             if (CursorHandler.IsInstantiated)
-                CursorHandler.Instance.OnValidSelection -= OnValidSelection;
+            {
+                CursorHandler.Instance.OnValidSelectionPerformed -= OnValidSelectionPerformed;
+                CursorHandler.Instance.OnValidSelectionCancelled -= OnValidSelectionCancelled;
+            }
             
             _lookAreaModificationAllowed = false;
         }
@@ -152,7 +160,7 @@ namespace CoreResources.Utils
                 _interactionPanelScript.InitializePanel();
 
                 if (CursorHandler.IsInstantiated)
-                    CursorHandler.Instance.OnValidInteractionPerformed += OnValidInteraction;
+                    CursorHandler.Instance.OnValidInteractionPerformed += OnValidInteractionPerformed;
             }
             else
             {
@@ -160,7 +168,7 @@ namespace CoreResources.Utils
                 _interactionPanel.SetActive(false);
 
                 if (CursorHandler.IsInstantiated)
-                    CursorHandler.Instance.OnValidInteractionPerformed -= OnValidInteraction;
+                    CursorHandler.Instance.OnValidInteractionPerformed -= OnValidInteractionPerformed;
 
                 _appP4LastHitPosition = Vector3.zero;
             }
@@ -213,25 +221,12 @@ namespace CoreResources.Utils
 
         private void ProcessMovementInput()
         {
-            if (InputManager.InputActions.XRILeftHandInteraction.UIPress.WasReleasedThisFrame())
+            if (_triggerPressed)
             {
-                if (_currentInteractable != null)
-                    _currentInteractable.SetHighlight(false);
+                var pos = _camHMD.position;
+                var rot = _camHMD.forward;
 
-                _triggerPressed = false;
-                _currentInteractable = null;
-
-                return;
-            }
-
-            var pos = _camHMD.position;
-            var rot = _camHMD.forward;
-            // var pos = InputManager.InputActions.XRIHead.Position.ReadValue<Vector3>();
-            // var rot = InputManager.InputActions.XRIHead.Rotation.ReadValue<Quaternion>();
-
-            if (Physics.SphereCast(pos, _spherecastRadius, rot, out var hit, _maxRaycastDistance, _collisionLayerMask.value))
-            {
-                _currentInteractable.UpdatePosition(hit.point);
+                _currentInteractable.UpdatePositionByReferenceLine(pos, rot);
             }
         }
 
@@ -393,7 +388,7 @@ namespace CoreResources.Utils
         }
 
         #region Event Listeners
-        private void OnValidSelection(Transform objTransform, Collider objCollider, Vector3 _)
+        private void OnValidSelectionPerformed(Transform objTransform, Collider objCollider)
         {
             var interactable = objCollider.GetComponent<LookAreaInteractable>();
             if (interactable != null)
@@ -404,7 +399,16 @@ namespace CoreResources.Utils
             }
         }
 
-        private void OnValidInteraction(Transform objTransform, Collider objCollider, Vector3 hitPosition)
+        private void OnValidSelectionCancelled()
+        {
+            if (_currentInteractable != null)
+                _currentInteractable.SetHighlight(false);
+
+            _triggerPressed = false;
+            _currentInteractable = null;
+        }
+
+        private void OnValidInteractionPerformed(Transform objTransform, Collider objCollider, Vector3 hitPosition)
         {
             if (GameplayHandler.Instance.Phase == AppPhase.Phase4)
             {

@@ -16,6 +16,7 @@ namespace CoreResources.Utils
 
         private Transform _centerTransform;
         private Vector3 _direction; // Should be normalized
+        private Vector3 _planarReferenceVector; // Used to find plane
         // private Vector3 _center = Vector3.zero;
         private Vector3 _defaultScale = Vector3.zero;
         private float _resizeDuration = 0.65f;
@@ -43,6 +44,7 @@ namespace CoreResources.Utils
         public void CalibrateInteractable()
         {
             _direction = transform.right.normalized;
+            _planarReferenceVector = transform.up.normalized;
             _defaultScale = transform.localScale;
         }
 
@@ -69,18 +71,52 @@ namespace CoreResources.Utils
             }
         }
 
-        public void UpdatePosition(Vector3 position)
+        /// <summary>
+        /// Update the position of the given interactable 
+        /// by using a reference line to calculate the new 
+        /// position. This reference line is drawn from a 
+        /// reference position and orientation
+        /// </summary>
+        /// <param name="referencePosition">
+        /// The position that the reference line should 
+        /// start or intersect from
+        /// </param>
+        /// <param name="referenceForward">
+        /// The normalized forward vector that determines 
+        /// the line direction
+        /// </param>
+        public void UpdatePositionByReferenceLine(Vector3 referencePosition, Vector3 referenceForward)
         {
-            if (_isInteractable)
-            {
-                var center = _centerTransform.position;
-                Vector3 local = position - center;
-                float projection = Vector3.Dot(local, _direction);
-                float clampedDistance = Mathf.Clamp(projection, minDistance, maxDistance);
-                Debug.LogError($"Center: {center}, Local: {local}, Projection: {projection}, Clamped Distance: {clampedDistance}");
+            if (!_isInteractable || _centerTransform == null)
+                return;
 
-                transform.position = center + _direction * clampedDistance;
+            Vector3 center = _centerTransform.position;
+
+            // Step 1: Create the movement plane from the center using the planar reference
+            Plane movementPlane = new Plane(_planarReferenceVector, center);
+
+            // Step 2: Find the intersection point of the reference line with the movement plane
+            float enter;
+            Ray referenceRay = new Ray(referencePosition, referenceForward);
+
+            if (!movementPlane.Raycast(referenceRay, out enter))
+            {
+                Debug.LogWarning("Reference line does not intersect the movement plane.");
+                return;
             }
+
+            Vector3 intersectionPoint = referenceRay.GetPoint(enter); // This is the point on the plane
+
+            // Step 3: Project from center to intersection point onto _direction
+            Vector3 local = intersectionPoint - center;
+            float projection = Vector3.Dot(local, _direction.normalized);
+
+            // Step 4: Clamp the projection to min/max range
+            float clampedProjection = Mathf.Clamp(projection, minDistance, maxDistance);
+
+            // Step 5: Set new position
+            Vector3 newPosition = center + _direction.normalized * clampedProjection;
+            transform.position = newPosition;
         }
     }
 }

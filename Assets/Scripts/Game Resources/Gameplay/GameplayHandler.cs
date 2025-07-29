@@ -190,8 +190,8 @@ namespace GameResources.Gameplay
         {
             if (CursorHandler.IsInstantiated)
             {
-                CursorHandler.Instance.OnValidSelection += OnValidSelection;
-                CursorHandler.Instance.OnValidCancellation += OnValidSelectionCancelled;
+                CursorHandler.Instance.OnValidSelectionPerformed += OnValidSelection;
+                CursorHandler.Instance.OnValidSelectionCancelled += OnValidSelectionCancelled;
                 CursorHandler.Instance.OnValidInteractionStarted += OnValidInteractionStarted;
                 CursorHandler.Instance.OnValidInteractionPerformed += OnValidInteractionPerformed;
                 CursorHandler.Instance.OnValidInteractionCancelled += OnValidInteractionCancelled;
@@ -287,8 +287,8 @@ namespace GameResources.Gameplay
         {
             if (CursorHandler.IsInstantiated)
             {
-                CursorHandler.Instance.OnValidSelection -= OnValidSelection;
-                CursorHandler.Instance.OnValidCancellation -= OnValidSelectionCancelled;
+                CursorHandler.Instance.OnValidSelectionPerformed -= OnValidSelection;
+                CursorHandler.Instance.OnValidSelectionCancelled -= OnValidSelectionCancelled;
                 CursorHandler.Instance.OnValidInteractionPerformed -= OnValidInteractionPerformed;
             }
 
@@ -329,7 +329,7 @@ namespace GameResources.Gameplay
             _phase4TargetRequested = true;
         }
 
-        private void OnValidSelection(Transform objTransform, Collider objCollider, Vector3 _)
+        private void OnValidSelection(Transform objTransform, Collider objCollider)
         {
             if (!_triggerPressed && (_collisionLayerMask.value & (1 << objCollider.gameObject.layer)) > 0)
             {
