@@ -17,8 +17,8 @@ namespace CoreResources.Utils
         private Transform _centerTransform;
         private Vector3 _direction; // Should be normalized
         private Vector3 _planarReferenceVector; // Used to find plane
-        // private Vector3 _center = Vector3.zero;
-        private Vector3 _defaultScale = Vector3.zero;
+        private Vector3 _defaultLocalPosition = default;
+        private Vector3 _defaultScale = default;
         private float _resizeDuration = 0.65f;
         private Renderer _renderer;
         private Collider _collider;
@@ -45,7 +45,15 @@ namespace CoreResources.Utils
         {
             _direction = transform.right.normalized;
             _planarReferenceVector = -1 * transform.forward.normalized;
+            _defaultLocalPosition = transform.localPosition;
             _defaultScale = transform.localScale;
+        }
+
+        public void ResetInteractable()
+        {
+            transform.localPosition = _defaultLocalPosition;
+            transform.localScale = _defaultScale;
+            SetHighlight(false);
         }
 
         public void EnableInteraction()
@@ -66,7 +74,7 @@ namespace CoreResources.Utils
         {
             if (_isInteractable)
             {
-                Color target = status ? (_highlightColor) : _defaultColor;
+                Color target = status ? _highlightColor : _defaultColor;
                 _renderer.material.SetColor("_EmissionColor", target);
             }
         }

@@ -11,7 +11,7 @@ namespace CoreResources.Utils
     [RequireComponent(typeof(MeshFilter))]
     public class LookAreaGenerator : DestroyableMonoSingleton<LookAreaGenerator>
     {
-        [SerializeField] private Transform _camHMD, _centerPos;
+        [SerializeField] private Transform _centerPos;
         [SerializeField] private GameObject _interactionPanel, _appP4TextBox;
         [SerializeField] private TextMeshProUGUI _appP4Text;
         [SerializeField] private List<Transform> _points = new List<Transform>(8);
@@ -38,6 +38,7 @@ namespace CoreResources.Utils
         private Mesh _fillMesh;
         private Mesh _borderMesh;
 
+        private Transform _camHMD;
         private GameObject _originMarker;
         private GameObject _targetMarker;
         private GameObject _connectionLine;
@@ -90,10 +91,28 @@ namespace CoreResources.Utils
         }
 
         #region Public Methods
+        public void InitSingleton(Transform camTransform)
+        {
+            if (camTransform == null)
+            {
+                Debug.LogError("Injected Camera transform is null!");
+                return;
+            }
+
+            _camHMD = camTransform;
+            InitSingleton();
+        }
+
         public void RecalibrateInteractables()
         {
             foreach (var interactable in _interactables)
                 interactable.CalibrateInteractable();
+        }
+
+        public void ResetInteractables()
+        {
+            foreach (var interactable in _interactables)
+                interactable.ResetInteractable();
         }
 
         public void GenerateMeshes()

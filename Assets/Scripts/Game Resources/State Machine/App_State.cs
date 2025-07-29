@@ -52,6 +52,7 @@ namespace GameResources.StateMachine
     {
         public override void OnEnter()
         {
+            GameplayHandler.OnPlayEvent?.Invoke(0);
             UIMediator.Instance.ResetMenus();
         }
 

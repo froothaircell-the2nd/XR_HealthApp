@@ -131,7 +131,8 @@ namespace GameResources.Gameplay
             _defaultSpawnPosition = _spawnCenter.position;
             _defaultSpawnRotation = _spawnCenter.rotation;
 
-            _dataHandler.InitSingleton();
+            _dataHandler.InitSingleton(_camHMD);
+            _lookAreaGenerator.InitSingleton(_camHMD);
 
             OnPlayEvent += OnPlay;
             OnExitEvent += OnExit;
@@ -221,7 +222,8 @@ namespace GameResources.Gameplay
                     _gameSetWarmup.SetActive(false);
                     _gameSetPhase2.SetActive(true);
                     _lookAreaGenerator.gameObject.SetActive(true);
-                    //_lookAreaGenerator.AllowLookAreaModification();
+                    _lookAreaGenerator.ResetInteractables();
+                    _lookAreaGenerator.AllowLookAreaModification();
 
                     if (_spawnCoroutine != null)
                     {
@@ -289,7 +291,9 @@ namespace GameResources.Gameplay
             {
                 CursorHandler.Instance.OnValidSelectionPerformed -= OnValidSelection;
                 CursorHandler.Instance.OnValidSelectionCancelled -= OnValidSelectionCancelled;
+                CursorHandler.Instance.OnValidInteractionStarted -= OnValidInteractionStarted;
                 CursorHandler.Instance.OnValidInteractionPerformed -= OnValidInteractionPerformed;
+                CursorHandler.Instance.OnValidInteractionCancelled -= OnValidInteractionCancelled;
             }
 
             ResetGame();

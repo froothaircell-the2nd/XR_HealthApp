@@ -8,6 +8,9 @@ namespace GameResources.Gameplay
 {
     public class PhysiologicalDataHandler : DestroyableMonoSingleton<PhysiologicalDataHandler>
     {
+        private Transform _camHMD;
+
+        private bool _userMeasurementStarted = false;
         private int _score;
         private const int MAX_SCORE = 15;
 
@@ -16,19 +19,15 @@ namespace GameResources.Gameplay
         public static Action<int> OnScoreUpdated;
 
         #region Overrides
-        public override void InitSingleton()
+        public override void OnInit()
         {
-            base.InitSingleton();
-
             ResetMetrics();
 
             GameplayHandler.OnPhase2Hit += IncrementScore;
             GameplayHandler.OnPlayEvent += SetCurrentMeasurementMode;
-            GameplayHandler.OnExitEvent += ResetCurrentMeasurementMode;
         }
 
-
-        public override void CleanSingleton()
+        public override void OnDeInit()
         {
             ResetMetrics();
 
@@ -36,9 +35,6 @@ namespace GameResources.Gameplay
             
             GameplayHandler.OnPhase2Hit -= IncrementScore;
             GameplayHandler.OnPlayEvent -= SetCurrentMeasurementMode;
-            GameplayHandler.OnExitEvent -= ResetCurrentMeasurementMode;
-
-            base.CleanSingleton();
         }
 
         private void FixedUpdate()
@@ -48,8 +44,21 @@ namespace GameResources.Gameplay
         #endregion
 
         #region Public Methods
+        public void InitSingleton(Transform camTransform)
+        {
+            if (camTransform == null)
+            {
+                Debug.LogError("Injected Camera transform is null!");
+                return;
+            }
+
+            _camHMD = camTransform;
+            InitSingleton();
+        }
+
         public void ResetMetrics()
         {
+            _userMeasurementStarted = false;
             _score = 0;
 
             if (GameplayHandler.Instance.Phase >= (AppPhase) 1)
@@ -75,11 +84,32 @@ namespace GameResources.Gameplay
 
         private void SetCurrentMeasurementMode(int currMode)
         {
-            
-        }
+            switch (currMode)
+            {
+                case 0:
+                    if (_userMeasurementStarted)
+                    {
+                        _userMeasurementStarted = false;
 
-        private void ResetCurrentMeasurementMode()
-        {
+                    }
+                    break;
+                case 1:
+                    if (!_userMeasurementStarted)
+                    {
+                        _userMeasurementStarted = true;
+                    }
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    break;
+                default:
+                    break;
+            }
         }
         #endregion
     }
