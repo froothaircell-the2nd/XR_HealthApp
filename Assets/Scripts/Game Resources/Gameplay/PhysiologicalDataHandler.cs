@@ -69,6 +69,9 @@ namespace GameResources.Gameplay
         #region Private Methods
         private void ProcessMetrics()
         {
+            if (!_userMeasurementStarted)
+                return;
+
 
         }
         #endregion

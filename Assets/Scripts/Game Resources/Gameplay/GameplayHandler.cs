@@ -173,12 +173,17 @@ namespace GameResources.Gameplay
             Vector3 finalPosition = origin + forward * _appCalibrationDistance;
 
             _gameSetWarmup.transform.position = finalPosition;
-            _gameSetPhase2.transform.rotation = rotation;
+            _gameSetWarmup.transform.rotation = rotation;
+            
             _lookAreaGenerator.transform.position = finalPosition;
             _lookAreaGenerator.transform.rotation = rotation;
             _lookAreaGenerator.RecalibrateInteractables();
+            
             _gameSetPhase2.transform.position = finalPosition;
             _gameSetPhase2.transform.rotation = rotation;
+            _defaultSpawnPosition = _spawnCenter.position;
+            _defaultSpawnRotation = _spawnCenter.rotation;
+            
             _gameSetPhase3.transform.position = finalPosition;
             _gameSetPhase3.transform.rotation = rotation;
 
@@ -217,8 +222,7 @@ namespace GameResources.Gameplay
                     _phase = (AppPhase)appPhase;
                     break;
                 case 2:
-                    ResetGame(false);
-
+                    // ResetGame(false);
                     _gameSetWarmup.SetActive(false);
                     _gameSetPhase2.SetActive(true);
                     _lookAreaGenerator.gameObject.SetActive(true);
@@ -296,7 +300,7 @@ namespace GameResources.Gameplay
                 CursorHandler.Instance.OnValidInteractionCancelled -= OnValidInteractionCancelled;
             }
 
-            ResetGame();
+            ResetGame(false);
         }
 
         private void RightGripPressed(InputAction.CallbackContext obj)
@@ -591,8 +595,6 @@ namespace GameResources.Gameplay
                 _cachedProjectile_Interaction = null;
             }
 
-            _phase = 0;
-
             _triggerPressed = false;
             _inputsAssigned = false;
             _centeringReticleDespawned = false;
@@ -609,6 +611,8 @@ namespace GameResources.Gameplay
 
             if (hardRest)
             {
+                _phase = 0;
+
                 _gameSetWarmup.SetActive(false);
                 _gameSetPhase2.SetActive(false);
                 _gameSetPhase3.SetActive(false);
