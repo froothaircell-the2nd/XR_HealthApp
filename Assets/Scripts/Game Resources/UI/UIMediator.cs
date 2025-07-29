@@ -81,7 +81,7 @@ namespace GameResources.UI
         #region Private Methods
         private void SetMenuStatus(UIViewType viewType, bool status)
         {
-            var currMenu = _viewManagers.FirstOrDefault((elem) => elem.AssignedViewType == UIViewType.MainMenu);
+            var currMenu = _viewManagers.FirstOrDefault((elem) => elem.AssignedViewType == viewType);
             currMenu.SetMenuInteractability(status);
             
             if (status)
@@ -96,33 +96,25 @@ namespace GameResources.UI
         {
             HideMenus();
 
-            UIViewManager currView = null;
-
             switch (appPhase)
             {
                 case 1:
-                    currView = _viewManagers.FirstOrDefault((elem) => elem.AssignedViewType == UIViewType.AppWarmup);
+                    SetMenuStatus(UIViewType.AppWarmup, true);
                     break;
                 case 2:
-                    currView = _viewManagers.FirstOrDefault((elem) => elem.AssignedViewType == UIViewType.AppP1);
+                    SetMenuStatus(UIViewType.AppP1, true);
                     break;
                 case 3:
-                    currView = _viewManagers.FirstOrDefault((elem) => elem.AssignedViewType == UIViewType.AppP2);
+                    SetMenuStatus(UIViewType.AppP2, true);
                     break;
                 case 4:
-                    currView = _viewManagers.FirstOrDefault((elem) => elem.AssignedViewType == UIViewType.AppP3);
+                    SetMenuStatus(UIViewType.AppP3, true);
                     break;
                 case 5:
-                    currView = _viewManagers.FirstOrDefault((elem) => elem.AssignedViewType == UIViewType.AppP4);
+                    SetMenuStatus(UIViewType.AppP4, true);
                     break;
                 default:
                     break;
-            }
-
-            if (currView != null)
-            {
-                currView.ShowPanel();
-                currView.SetMenuInteractability(true);
             }
         }
         #endregion    

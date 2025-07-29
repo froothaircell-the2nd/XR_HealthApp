@@ -221,7 +221,7 @@ namespace GameResources.Gameplay
                     _gameSetWarmup.SetActive(false);
                     _gameSetPhase2.SetActive(true);
                     _lookAreaGenerator.gameObject.SetActive(true);
-                    _lookAreaGenerator.AllowLookAreaModification();
+                    //_lookAreaGenerator.AllowLookAreaModification();
 
                     if (_spawnCoroutine != null)
                     {

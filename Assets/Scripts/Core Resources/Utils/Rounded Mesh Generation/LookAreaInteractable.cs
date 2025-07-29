@@ -44,7 +44,7 @@ namespace CoreResources.Utils
         public void CalibrateInteractable()
         {
             _direction = transform.right.normalized;
-            _planarReferenceVector = transform.up.normalized;
+            _planarReferenceVector = -1 * transform.forward.normalized;
             _defaultScale = transform.localScale;
         }
 
@@ -101,7 +101,7 @@ namespace CoreResources.Utils
 
             if (!movementPlane.Raycast(referenceRay, out enter))
             {
-                Debug.LogWarning("Reference line does not intersect the movement plane.");
+                Debug.LogError("Reference line does not intersect the movement plane.");
                 return;
             }
 

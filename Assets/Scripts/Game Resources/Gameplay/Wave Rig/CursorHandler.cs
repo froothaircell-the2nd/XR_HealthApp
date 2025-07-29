@@ -354,7 +354,6 @@ namespace GameResources.Gameplay.VRController
         {
             if (CursorMode == CursorMode.Interacting && _selectionEnabled) // can only select when we get interactable objects in range
             {
-                Debug.LogError("Select Performed");
                 CursorMode = CursorMode.Selecting;
             }
         }
@@ -363,8 +362,6 @@ namespace GameResources.Gameplay.VRController
         {
             if (CursorMode == CursorMode.Selecting && _selectionEnabled)
             {
-                Debug.LogError("Select Cancelled");
-
                 ResetCursorDimensions();
                 
                 CursorMode = CursorMode.Default;
