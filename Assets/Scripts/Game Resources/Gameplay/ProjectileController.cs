@@ -68,7 +68,8 @@ namespace GameResources.Gameplay
         #region Public Properties
         public Action OnWarmupTargetSelected = null;
         public Action OnCenteringReticleDespawned = null;
-        public Action OnPhase3ProjectileDespawned = null;
+        public Action<Transform> OnPhase3ProjectileMovementStarted = null;
+        public Action OnPhase3ProjectileMovementComplete = null;
         public Action OnPhase4TargetDespawned = null;
 
         public bool IsInteractable
@@ -164,7 +165,8 @@ namespace GameResources.Gameplay
 
             OnWarmupTargetSelected = null;
             OnCenteringReticleDespawned = null;
-            OnPhase3ProjectileDespawned = null;
+            OnPhase3ProjectileMovementStarted = null;
+            OnPhase3ProjectileMovementComplete = null;
 
             if (_currentProjectileMode == ProjectileMode.Phase3Projectile)
             {
@@ -284,6 +286,7 @@ namespace GameResources.Gameplay
             yield return new WaitUntil(() => _phase3startPath);
 
             // _splineFollower.Execute(Time.deltaTime);
+            OnPhase3ProjectileMovementStarted?.Invoke(transform);
             _splineFollower.executionStatus = true;
         }
 
@@ -291,6 +294,7 @@ namespace GameResources.Gameplay
         {
             GameplayHandler.OnEnablePhase3NextButton?.Invoke();
             _splineFollower.executionStatus = false;
+            OnPhase3ProjectileMovementComplete?.Invoke();
             ReturnToPool();
         }
         #endregion

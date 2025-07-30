@@ -24,31 +24,45 @@ namespace GameResources.Gameplay
 
         private string _rootFolderPath;
 
+        [Header("Data Collection Settings")]
+        [SerializeField] private int _bufferSize_HMDPosRot = 60;
+        [SerializeField] private int _bufferSize_AppP2Response = 60;
+        [SerializeField] private int _bufferSize_AppP3Response = 60;
+        
+        #region App Phase 2
         private string _responsePathCsv;
         private string _responseDataCsv;
-        private bool _userResponseMeasurementStarted = false;
-        private Plane _cachedTargetPlane;
+        private bool _userResponseMeasurementStartedP2 = false;
+        private Plane _cachedTargetPlaneP2;
         private Vector3 _cachedCenter, _cachedTarget, _cachedTargetPlaneUp;
         private List<(Vector2 point, DateTime timestamp)> _responseBuffer;
         private DateTime _responseStartTime;
-        private int _responseIndex = 0;
+        private int _responseIndexP2 = 0;
         private const string RESPONSE_PATH_HEADER = "Timestamp,PosX,PosY\n";
         private const string RESPONSE_DATA_HEADER = "ResponseID,StartTime,DurationSeconds,CenterX,CenterY,TargetX,TargetY\n";
         private const string BUFFER_DATA_KEY_P2RESPONSE = "respBuffer";
 
-
         public static Action<int> OnScoreUpdated;
+        #endregion
 
-        [Header("Data Collection Settings")]
-        [SerializeField] private int _bufferSize_HMDPosRot = 60;
-        [SerializeField] private int _bufferSize_AppP2Response = 60;
+        #region App Phase 3
+        private bool _userResponseMeasurementStartedP3 = false;
+        private Transform _targetReferenceP3 = null;
+        private Plane _cachedTargetPlaneP3;
+        private List<(float distance, DateTime timestamp)> _distanceBufferP3;
+        private string _distanceCsvPathP3;
+        private const string DISTANCE_HEADER_P3 = "Timestamp,Distance\n";
+        private const string BUFFER_DATA_KEY_P3DISTANCE = "p3distanceBuffer";
+        private int _distanceSampleIndexP3 = 0;
+        #endregion
 
+        #region App Wide Measurements
         private List<string> _dataBuffer = new List<string>();
         private string _hmdPosRotCsvPath;
         private string _fileTime;
         private const string HMDPOSROT_HEADER = "Timestamp,PosX,PosY,PosZ,RotX,RotY,RotZ,RotW\n";
         private const string BUFFER_DATA_KEY_HMDPOSROT = "bufferDataHMD";
-
+        #endregion
 
         #region Overrides
         public override void OnInit()
@@ -99,13 +113,17 @@ namespace GameResources.Gameplay
         public void ResetMetrics()
         {
             _userMeasurementStarted = false;
-            _userResponseMeasurementStarted = false;
+            _userResponseMeasurementStartedP2 = false;
+            _userResponseMeasurementStartedP3 = false;
 
             _cachedCenter = _cachedTarget = default;
-            _cachedTargetPlane = default;
+            _cachedTargetPlaneP2 = default;
+
+            _targetReferenceP3 = null;
 
             _score = 0;
-            _responseIndex = 0;
+            _responseIndexP2 = 0;
+            _distanceSampleIndexP3 = 0;
             _dataBuffer.Clear();
 
             if (GameplayHandler.Instance.Phase >= (AppPhase) 1)
@@ -174,11 +192,11 @@ namespace GameResources.Gameplay
 
         public void MeasureUserResponse_AppP2(Vector3 center, Vector3 target, Vector3 up, Plane targetPlane)
         {
-            if (!_userResponseMeasurementStarted)
+            if (!_userResponseMeasurementStartedP2)
             {
-                _userResponseMeasurementStarted = true;
+                _userResponseMeasurementStartedP2 = true;
 
-                _cachedTargetPlane = targetPlane;
+                _cachedTargetPlaneP2 = targetPlane;
                 _cachedCenter = center;
                 _cachedTarget = target;
                 _cachedTargetPlaneUp = up;
@@ -187,7 +205,7 @@ namespace GameResources.Gameplay
                 _responseStartTime = DateTime.UtcNow;
 
                 // Build file paths for this response:
-                string idx = _responseIndex.ToString();
+                string idx = _responseIndexP2.ToString();
                 _responsePathCsv = Path.Combine(_rootFolderPath,
                     $"ResponsePath_{idx}_{_fileTime}.csv");
                 _responseDataCsv = Path.Combine(_rootFolderPath,
@@ -195,6 +213,37 @@ namespace GameResources.Gameplay
 
                 File.WriteAllText(_responsePathCsv, RESPONSE_PATH_HEADER);
                 File.WriteAllText(_responseDataCsv, RESPONSE_DATA_HEADER);
+            }
+        }
+        
+        public void BeginUserPathTracking_AppP3(Transform reference, Vector3 referenceForward)
+        {
+            if (!_userResponseMeasurementStartedP3)
+            {
+                _targetReferenceP3 = reference;
+                _cachedTargetPlaneP3 = new Plane(referenceForward, _targetReferenceP3.position);
+                _userResponseMeasurementStartedP3 = true;
+
+                _distanceBufferP3 = new List<(float, DateTime)>();
+
+                string filename = $"P3_Distance_{_distanceSampleIndexP3}_{_fileTime}.csv";
+                _distanceCsvPathP3 = Path.Combine(_rootFolderPath, filename);
+
+                File.WriteAllText(_distanceCsvPathP3, DISTANCE_HEADER_P3); // Header
+            }
+        }
+
+        public void EndUserPathTracking_AppP3()
+        {
+            if (_userResponseMeasurementStartedP3)
+            {
+                FlushP3DistanceBuffer();
+
+                _targetReferenceP3 = null;
+                _cachedTargetPlaneP3 = default;
+                _userResponseMeasurementStartedP3 = false;
+                
+                _distanceSampleIndexP3++;
             }
         }
         #endregion
@@ -226,15 +275,15 @@ namespace GameResources.Gameplay
                 TaskUtilitiesManager.RunTask(WriteDataAsync_HMDPosRot, context);
             }
 
-            if (_userResponseMeasurementStarted)
+            if (_userResponseMeasurementStartedP2)
             {
                 // Store Response Path Here
                 Ray ray = new Ray(_camHMD.position, _camHMD.forward);
-                if (_cachedTargetPlane.Raycast(ray, out float enter))
+                if (_cachedTargetPlaneP2.Raycast(ray, out float enter))
                 {
                     Vector3 hit = ray.GetPoint(enter);
 
-                    Vector3 normal = _cachedTargetPlane.normal;
+                    Vector3 normal = _cachedTargetPlaneP2.normal;
                     Vector3 right = Vector3.Cross(normal, _cachedTargetPlaneUp).normalized;
                     Vector3 up = Vector3.Cross(right, normal).normalized;
 
@@ -246,7 +295,26 @@ namespace GameResources.Gameplay
 
                     if (_responseBuffer.Count >= _bufferSize_AppP2Response)
                     {
-                        FlushResponseBuffer();
+                        FlushP2ResponseBuffer();
+                    }
+                }
+            }
+
+            if (_userResponseMeasurementStartedP3 && _targetReferenceP3 != null)
+            {
+                Ray ray = new Ray(_camHMD.position, _camHMD.forward);
+
+                if (_cachedTargetPlaneP3.Raycast(ray, out float enter))
+                {
+                    Vector3 hit = ray.GetPoint(enter);
+                    float distance = Vector3.Distance(hit, _targetReferenceP3.position);
+                    DateTime ts = DateTime.UtcNow;
+
+                    _distanceBufferP3.Add((distance, ts));
+
+                    if (_distanceBufferP3.Count >= _bufferSize_AppP3Response)
+                    {
+                        FlushP3DistanceBuffer();
                     }
                 }
             }
@@ -274,7 +342,7 @@ namespace GameResources.Gameplay
             }
         }
 
-        private void FlushResponseBuffer()
+        private void FlushP2ResponseBuffer()
         {
             var copy = new List<(Vector2, DateTime)>(_responseBuffer);
             _responseBuffer.Clear();
@@ -282,10 +350,10 @@ namespace GameResources.Gameplay
             UniTaskContext ctx = new UniTaskContext();
             ctx.Set(BUFFER_DATA_KEY_P2RESPONSE, copy);
 
-            TaskUtilitiesManager.RunTask(FlushResponseBuffer_Async, ctx);
+            TaskUtilitiesManager.RunTask(FlushP2ResponseBuffer_Async, ctx);
         }
         
-        private async UniTask FlushResponseBuffer_Async(CancellationToken token, UniTaskContext context)
+        private async UniTask FlushP2ResponseBuffer_Async(CancellationToken token, UniTaskContext context)
         {
             if (context.TryGet<List<(Vector2, DateTime)>>(BUFFER_DATA_KEY_P2RESPONSE, out var list))
             {
@@ -299,23 +367,54 @@ namespace GameResources.Gameplay
                 }
             }
         }
+
+        private void FlushP3DistanceBuffer()
+        {
+            if (_distanceBufferP3 == null || _distanceBufferP3.Count == 0)
+                return;
+
+            var copy = new List<(float, DateTime)>(_distanceBufferP3);
+            _distanceBufferP3.Clear();
+
+            UniTaskContext ctx = new UniTaskContext();
+            ctx.Set(BUFFER_DATA_KEY_P3DISTANCE, copy);
+
+            TaskUtilitiesManager.RunTask(FlushP3DistanceBuffer_Async, ctx);
+        }
+
+        private async UniTask FlushP3DistanceBuffer_Async(CancellationToken token, UniTaskContext context)
+        {
+            if (context.TryGet<List<(float, DateTime)>>(BUFFER_DATA_KEY_P3DISTANCE, out var list))
+            {
+                var sb = new StringBuilder();
+                foreach (var (dist, ts) in list)
+                {
+                    sb.AppendLine($"{ts:o},{dist:F4}");
+                }
+
+                using (var writer = new StreamWriter(_distanceCsvPathP3, append: true))
+                {
+                    await writer.WriteAsync(sb.ToString());
+                }
+            }
+        }
         #endregion
 
         #region Event Listeners
         private void OnTargetHit_AppP2()
         {
-            if (!_userResponseMeasurementStarted)
+            if (!_userResponseMeasurementStartedP2)
                 return;
 
             _score += 1;
 
-            FlushResponseBuffer();
+            FlushP2ResponseBuffer();
 
             DateTime end = DateTime.UtcNow;
             double duration = (end - _responseStartTime).TotalSeconds;
 
             // 2D center and target projection
-            Vector3 normal = _cachedTargetPlane.normal;
+            Vector3 normal = _cachedTargetPlaneP2.normal;
             Vector3 right = Vector3.Cross(normal, _cachedTargetPlaneUp).normalized;
             Vector3 up = Vector3.Cross(right, normal).normalized;
 
@@ -326,12 +425,12 @@ namespace GameResources.Gameplay
             string startTime = _responseStartTime.ToString("o", CultureInfo.InvariantCulture);
 
             var sb = new StringBuilder();
-            sb.AppendLine($"{_responseIndex},{startTime},{duration:F4},{center2D.x:F4},{center2D.y:F4},{target2D.x:F4},{target2D.y:F4}");
+            sb.AppendLine($"{_responseIndexP2},{startTime},{duration:F4},{center2D.x:F4},{center2D.y:F4},{target2D.x:F4},{target2D.y:F4}");
 
             File.AppendAllText(_responseDataCsv, sb.ToString());
 
-            _userResponseMeasurementStarted = false;
-            _responseIndex++;
+            _userResponseMeasurementStartedP2 = false;
+            _responseIndexP2++;
 
             if (GameplayHandler.Instance.Phase >= (AppPhase) 1)
                 OnScoreUpdated?.Invoke(_score);

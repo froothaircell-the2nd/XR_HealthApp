@@ -581,6 +581,8 @@ namespace GameResources.Gameplay
         {
             var res = (ProjectileController) item;
 
+            res.OnPhase3ProjectileMovementStarted += (reference) => { _dataHandler.BeginUserPathTracking_AppP3(reference, -1 * _interactionPanel_AppP3.transform.forward); };
+            res.OnPhase3ProjectileMovementComplete += () => { _dataHandler.EndUserPathTracking_AppP3(); };
             res.InitializeItem(ProjectileMode.Phase3Projectile);
             res.InjectSpline(spline);
         }
