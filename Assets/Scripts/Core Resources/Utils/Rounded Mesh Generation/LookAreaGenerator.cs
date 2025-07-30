@@ -226,6 +226,8 @@ namespace CoreResources.Utils
 
             _appP4Text.text = $"Displacement: {displacement}\nDistance: {distance}";
 
+            PhysiologicalDataHandler.Instance.RecordDistanceFromCenter_AppP4(displacement, distance);
+
             _appP4TextBox.SetActive(true);
             _originMarker.SetActive(true);
             _targetMarker.SetActive(true);

@@ -56,6 +56,12 @@ namespace GameResources.Gameplay
         private int _distanceSampleIndexP3 = 0;
         #endregion
 
+        #region App Phase 4
+        private string _distanceCsvPathP4 = "";
+        private const string DISTANCE_HEADER_P4 = "Timestamp,DistanceX,DistanceY,DistanceZ,Displacement\n";
+
+        #endregion
+
         #region App Wide Measurements
         private List<string> _dataBuffer = new List<string>();
         private string _hmdPosRotCsvPath;
@@ -245,6 +251,24 @@ namespace GameResources.Gameplay
                 
                 _distanceSampleIndexP3++;
             }
+        }
+
+        public void RecordDistanceFromCenter_AppP4(Vector3 distance, float displacement)
+        {
+            if (string.IsNullOrEmpty(_distanceCsvPathP4))
+            {
+                string filename = $"ProprioceptionDistance_{_fileTime}.csv";
+                _distanceCsvPathP4 = Path.Combine(_rootFolderPath, filename);
+
+                // Write header if file does not exist
+                if (!File.Exists(_distanceCsvPathP4))
+                    File.WriteAllText(_distanceCsvPathP4, DISTANCE_HEADER_P4);
+            }
+
+            string timestamp = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
+            string line = $"{timestamp},{distance.x:F4},{distance.y:F4},{distance.z:F4},{displacement:F4}\n";
+
+            File.AppendAllText(_distanceCsvPathP4, line);
         }
         #endregion
 
