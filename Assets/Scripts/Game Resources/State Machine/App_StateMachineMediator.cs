@@ -5,6 +5,7 @@ using UnityEngine;
 using GameResources.UI;
 using GameResources.Gameplay;
 using GameResources.Gameplay.VRController;
+using CoreResources.Managers;
 
 namespace GameResources.StateMachine
 {
@@ -23,6 +24,8 @@ namespace GameResources.StateMachine
         private UIMediator _UIManager;
         [SerializeField]
         private GameplayHandler _gameManager;
+
+        private TaskUtilitiesManager _taskUtilitiesManager = new TaskUtilitiesManager();
         #endregion
 
         #region Overrides
@@ -120,6 +123,8 @@ namespace GameResources.StateMachine
         #region Private Methods
         private void InitializeManagers()
         {
+            _taskUtilitiesManager.InitSingleton();
+
             _inputManager.gameObject.SetActive(true);
             _inputManager.InitSingleton();
             _objPool.gameObject.SetActive(true);
@@ -136,6 +141,8 @@ namespace GameResources.StateMachine
             _objPool.CleanSingleton();
             _UIManager.CleanSingleton();
             _gameManager.CleanSingleton();
+
+            _taskUtilitiesManager.CleanSingleton();
         }
         #endregion
     }

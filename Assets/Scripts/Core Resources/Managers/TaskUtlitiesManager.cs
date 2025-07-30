@@ -65,6 +65,27 @@ namespace CoreResources.Managers
         }
 
         /// <summary>
+        /// Wrapper function to run an arbitrary task on the thread pool with some given context
+        /// </summary>
+        /// <param name="task">Task to run</param>
+        /// <param name="context">Context to use with the task</param>
+        /// <param name="OnSuccess">Callback to run on success</param>
+        /// <param name="OnFail">Callback to run on fail</param>
+        /// <param name="setTimeout">Flag for setting a timeout of the task</param>
+        /// <param name="timeout">Timeout value of the task</param>
+        public static void RunTask(Func<CancellationToken, UniTaskContext, UniTask> task, UniTaskContext context, Action OnSuccess = null, Action OnFail = null, bool setTimeout = false, int timeout = 5000)
+        {
+            var cts = new CancellationTokenSource();
+            if (!TrySetCancellationToken(task, cts))
+                return;
+
+            if (setTimeout)
+                cts.CancelAfterSlim(timeout);
+
+            UniTask.RunOnThreadPool(() => TaskWrapper(task, cts.Token, context, OnSuccess, OnFail));
+        }
+
+        /// <summary>
         /// Wrapper function to run an arbitrary task with a return value on the thread pool
         /// </summary>
         /// <typeparam name="T">Return type</typeparam>
@@ -134,6 +155,18 @@ namespace CoreResources.Managers
         }
 
         /// <summary>
+        /// Cancel a task with some context by the function reference. Lambda function will not work
+        /// </summary>
+        /// <param name="task">task to cancel</param>
+        public static void CancelTask(Func<CancellationToken, UniTaskContext, UniTask> task)
+        {
+            if (!TryGetCancellationToken(task, out var cts))
+                return;
+
+            cts.Cancel();
+        }
+
+        /// <summary>
         /// Cancel a task with a return type by the function reference. Lambda function will not work
         /// </summary>
         /// <typeparam name="T">The return type</typeparam>
@@ -162,6 +195,18 @@ namespace CoreResources.Managers
 
         #region Cancellation Token Management
         private static bool TrySetCancellationToken(Func<CancellationToken, UniTask> task, CancellationTokenSource tokenSource)
+        {
+            var ID = IDGenerator.GetId(task.Method, out var first);
+            if (!_genericTaskCancellationHandles.TryAdd(ID, tokenSource))
+            {
+                Debug.LogError("Task could not be added to the dictionary");
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool TrySetCancellationToken(Func<CancellationToken, UniTaskContext, UniTask> task, CancellationTokenSource tokenSource)
         {
             var ID = IDGenerator.GetId(task.Method, out var first);
             if (!_genericTaskCancellationHandles.TryAdd(ID, tokenSource))
@@ -203,6 +248,25 @@ namespace CoreResources.Managers
             return true;
         }
 
+        private static bool TryGetCancellationToken(Func<CancellationToken, UniTaskContext, UniTask> task, out CancellationTokenSource cts)
+        {
+            var ID = IDGenerator.GetId(task.Method, out var first);
+            if (first)
+            {
+                Debug.LogWarning(_newIdGenerated);
+            }
+
+            if (!_genericTaskCancellationHandles.TryGetValue(ID, out var tokenSource))
+            {
+                Debug.LogWarning("Task does not have a corresponding Cancellation token");
+                cts = null;
+                return false;
+            }
+
+            cts = tokenSource;
+            return true;
+        }
+
         private static bool TryGetCancellationToken<T>(Func<CancellationToken, UniTask<T>> task, out CancellationTokenSource cts)
         {
             var ID = IDGenerator.GetId(task.Method, out var first);
@@ -223,6 +287,23 @@ namespace CoreResources.Managers
         }
 
         private static bool TryRemoveCancellationToken(Func<CancellationToken, UniTask> task)
+        {
+            var ID = IDGenerator.GetId(task.Method, out var first);
+            if (first)
+            {
+                Debug.LogWarning(_newIdGenerated);
+            }
+
+            if (!_genericTaskCancellationHandles.Remove(ID))
+            {
+                Debug.LogWarning("Cancellation Token no longer present in dictionary");
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool TryRemoveCancellationToken(Func<CancellationToken, UniTaskContext, UniTask> task)
         {
             var ID = IDGenerator.GetId(task.Method, out var first);
             if (first)
@@ -282,6 +363,30 @@ namespace CoreResources.Managers
             }
         }
 
+        private static async UniTask TaskWrapper(Func<CancellationToken, UniTaskContext, UniTask> task, CancellationToken token, UniTaskContext context, Action OnSuccess = null, Action OnFail = null)
+        {
+            try
+            {
+                await task.Invoke(token, context);
+                TryRemoveCancellationToken(task);
+                if (OnSuccess != null)
+                {
+                    await UniTask.SwitchToMainThread();
+                    OnSuccess.Invoke();
+                }
+            }
+            catch (OperationCanceledException ex)
+            {
+                Debug.Log($"Task cancelled: {ex}");
+                TryRemoveCancellationToken(task);
+                if (OnFail != null)
+                {
+                    await UniTask.SwitchToMainThread();
+                    OnFail.Invoke();
+                }
+            }
+        }
+
         private static async UniTask<T> TaskWrapper<T>(Func<CancellationToken, UniTask<T>> task, CancellationToken token, Action<T> OnSuccess = null, Action OnFail = null)
         {
             try
@@ -308,5 +413,37 @@ namespace CoreResources.Managers
             }
         }
         #endregion
+    }
+
+    public class UniTaskContext
+    {
+        private readonly Dictionary<string, object> _data = new();
+
+        public void Set<T>(string key, T value)
+        {
+            _data[key] = value;
+        }
+
+        public T Get<T>(string key)
+        {
+            if (_data.TryGetValue(key, out var value) && value is T castValue)
+                return castValue;
+
+            return default;
+        }
+
+        public bool TryGet<T>(string key, out T value)
+        {
+            if (_data.TryGetValue(key, out var obj) && obj is T castObj)
+            {
+                value = castObj;
+                return true;
+            }
+
+            value = default;
+            return false;
+        }
+
+        public bool HasKey(string key) => _data.ContainsKey(key);
     }
 }

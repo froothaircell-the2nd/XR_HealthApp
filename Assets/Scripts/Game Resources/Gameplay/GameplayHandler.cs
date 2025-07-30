@@ -131,6 +131,7 @@ namespace GameResources.Gameplay
             _defaultSpawnPosition = _spawnCenter.position;
             _defaultSpawnRotation = _spawnCenter.rotation;
 
+            _dataHandler.gameObject.SetActive(true);
             _dataHandler.InitSingleton(_camHMD);
             _lookAreaGenerator.InitSingleton(_camHMD);
 
@@ -205,6 +206,9 @@ namespace GameResources.Gameplay
 
             switch (appPhase)
             {
+                case 0:
+                    _phase = (AppPhase)appPhase;
+                    break;
                 case 1:
                     // Initialization for warmup
                     _gameSetWarmup.SetActive(true);
@@ -222,7 +226,8 @@ namespace GameResources.Gameplay
                     _phase = (AppPhase)appPhase;
                     break;
                 case 2:
-                    // ResetGame(false);
+                    ResetGame(false);
+
                     _gameSetWarmup.SetActive(false);
                     _gameSetPhase2.SetActive(true);
                     _lookAreaGenerator.gameObject.SetActive(true);
@@ -238,6 +243,8 @@ namespace GameResources.Gameplay
                     _phase = (AppPhase)appPhase;
                     break;
                 case 3:
+                    ResetGame(false);
+
                     _lookAreaGenerator.RestrictLookAreaModification();
 
                     _phase2ProjectileDespawned = false;
@@ -249,6 +256,8 @@ namespace GameResources.Gameplay
                     _phase = (AppPhase)appPhase;
                     break;
                 case 4:
+                    ResetGame(false);
+
                     _gameSetPhase3.SetActive(true);
                     _lookAreaGenerator.RestrictLookAreaModification();
                     _lookAreaGenerator.gameObject.SetActive(false);
@@ -300,7 +309,7 @@ namespace GameResources.Gameplay
                 CursorHandler.Instance.OnValidInteractionCancelled -= OnValidInteractionCancelled;
             }
 
-            ResetGame(false);
+            ResetGame();
         }
 
         private void RightGripPressed(InputAction.CallbackContext obj)
