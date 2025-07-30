@@ -245,6 +245,7 @@ namespace GameResources.Gameplay
                 case 3:
                     ResetGame(false);
 
+                    _lookAreaGenerator.RecordViewingAngleBounds();
                     _lookAreaGenerator.RestrictLookAreaModification();
 
                     _phase2ProjectileDespawned = false;

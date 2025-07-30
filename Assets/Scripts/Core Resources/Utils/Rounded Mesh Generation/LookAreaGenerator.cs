@@ -3,6 +3,7 @@ using CoreResources.Singleton;
 using GameResources.Gameplay;
 using GameResources.Gameplay.VRController;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -235,6 +236,20 @@ namespace CoreResources.Utils
 
             _appP4Text.text = string.Empty;
             _appP4TextBox.SetActive(false);
+        }
+        
+        public void RecordViewingAngleBounds()
+        {
+            List<Vector3> currInteractablePositions = new List<Vector3>();
+
+            for (int i = 0; i < 8; i++)
+            {
+                var curInteractable = _interactables.FirstOrDefault((x) => x.ViewingDirection == (ViewAngleDirection)i);
+                var currPos = curInteractable.transform.position;
+                currInteractablePositions.Add(currPos);
+            }
+
+            PhysiologicalDataHandler.Instance.RecordViewingAngleBounds_Sorted(_centerPos.position, currInteractablePositions);
         }
         #endregion
 

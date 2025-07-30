@@ -7,12 +7,26 @@ using UnityEngine;
 
 namespace CoreResources.Utils
 {
+    public enum ViewAngleDirection
+    {
+        Top = 0,
+        TopRight = 1,
+        Right = 2,
+        BottomRight = 3,
+        Bottom = 4,
+        BottomLeft = 5,
+        Left = 6,
+        TopLeft = 7
+    }
+
     public class LookAreaInteractable : MonoBehaviour, ICursorInteractable
     {
         [SerializeField, ColorUsage(true, true)]
         private Color _highlightColor;
         [SerializeField]
         private float minDistance = 0.5f, maxDistance = 2f;
+        [SerializeField]
+        private ViewAngleDirection _viewAngleDirection;
 
         private Transform _centerTransform;
         private Vector3 _direction; // Should be normalized
@@ -24,6 +38,8 @@ namespace CoreResources.Utils
         private Collider _collider;
         private Color _defaultColor;
         private bool _isInteractable = false;
+
+        public ViewAngleDirection ViewingDirection => _viewAngleDirection;
 
         public bool IsInteractable
         {

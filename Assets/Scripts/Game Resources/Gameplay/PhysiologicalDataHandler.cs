@@ -29,8 +29,10 @@ namespace GameResources.Gameplay
 
         private List<string> _dataBuffer = new List<string>();
         private string _csvPath;
+        private string _fileTime;
 
         private const string BUFFER_DATA_KEY = "bufferData";
+
 
         #region Overrides
         public override void OnInit()
@@ -44,7 +46,8 @@ namespace GameResources.Gameplay
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
 
-            string filename = $"PhysioLog_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.csv";
+            _fileTime = $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}";
+            string filename = $"HeadPosRot_{_fileTime}.csv";
             _csvPath = Path.Combine(folder, filename);
 
             File.WriteAllText(_csvPath, "Timestamp,PosX,PosY,PosZ,RotX,RotY,RotZ,RotW\n"); // Header
@@ -89,6 +92,66 @@ namespace GameResources.Gameplay
 
             if (GameplayHandler.Instance.Phase >= (AppPhase) 1)
                 OnScoreUpdated?.Invoke(_score);
+        }
+
+        public void RecordViewingAngleBounds_Sorted(Vector3 center, List<Vector3> viewLimits)
+        {
+            if (_camHMD == null)
+            {
+                Debug.LogError("CamHMD is not set.");
+                return;
+            }
+
+            if (viewLimits == null || viewLimits.Count != 8)
+            {
+                Debug.LogError("Expected 8 view limit edge points.");
+                return;
+            }
+
+            // Direction labels in fixed order
+            string[] directionLabels = new[]
+            {
+                "Top", "TopRight", "Right", "BottomRight",
+                "Bottom", "BottomLeft", "Left", "TopLeft"
+            };
+
+            Vector3 camPosition = _camHMD.position;
+            Vector3 forward = _camHMD.forward;
+
+            List<float> angles = new List<float>();
+
+            for (int i = 0; i < viewLimits.Count; i++)
+            {
+                Vector3 toEdge = (viewLimits[i] - camPosition).normalized;
+                float angle = Vector3.Angle(forward, toEdge);
+                angles.Add(angle);
+            }
+
+            // Create CSV contents
+            string timestamp = DateTime.UtcNow.ToString("o", CultureInfo.InvariantCulture);
+            StringBuilder sb = new StringBuilder();
+
+            // Header
+            sb.Append("Timestamp");
+            foreach (string label in directionLabels)
+                sb.Append($",{label}");
+            sb.AppendLine();
+
+            // Data
+            sb.Append(timestamp);
+            foreach (float angle in angles)
+                sb.Append($",{angle:F2}");
+            sb.AppendLine();
+
+            // Write to file
+            string folder = Path.Combine(Application.persistentDataPath, "PhysioLogs");
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
+
+            string filename = $"ViewLimits_{_fileTime}.csv";
+            string viewLimitsPath = Path.Combine(folder, filename);
+
+            File.WriteAllText(viewLimitsPath, sb.ToString());
         }
         #endregion
 
