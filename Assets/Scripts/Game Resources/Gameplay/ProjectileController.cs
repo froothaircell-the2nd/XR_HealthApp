@@ -236,12 +236,12 @@ namespace GameResources.Gameplay
         {
             if (!IsPooled)
             {
-                var targetVelocity = transform.forward * _targetVelocity;
-                var currentVelocity = _rb.velocity;
-                // _currentVelocity += _velocityBlendStrength * Time.deltaTime * (targetVelocity - _currentVelocity);
+                // Additional functionality that can optionally be added. Makes the target move forward
 
-                // transform.Translate(_currentVelocity);
-                _rb.AddForce((targetVelocity - currentVelocity) * _velocityBlendStrength);
+                //var targetVelocity = transform.forward * _targetVelocity;
+                //var currentVelocity = _rb.velocity;
+                
+                //_rb.AddForce((targetVelocity - currentVelocity) * _velocityBlendStrength);
             }
         }
 

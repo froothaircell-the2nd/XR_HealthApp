@@ -86,6 +86,8 @@ namespace GameResources.Gameplay
         #region Private Fields
         private Vector3 _defaultSpawnPosition;
         private Quaternion _defaultSpawnRotation;
+        private Vector3 _defaultLookAreaNormalVector;
+        private Vector3 _defaultLookAreaUpVector;
         private Coroutine _spawnCoroutine;
         private int _spawnCount, _warmupSelectedCount;
         private bool _triggerPressed = false,
@@ -178,7 +180,9 @@ namespace GameResources.Gameplay
             
             _lookAreaGenerator.transform.position = finalPosition;
             _lookAreaGenerator.transform.rotation = rotation;
-            _lookAreaGenerator.RecalibrateInteractables();
+            _lookAreaGenerator.RecalibrateInteractables(
+                out _defaultLookAreaNormalVector, 
+                out _defaultLookAreaUpVector);
             
             _gameSetPhase2.transform.position = finalPosition;
             _gameSetPhase2.transform.rotation = rotation;
@@ -457,6 +461,8 @@ namespace GameResources.Gameplay
                 _pool.SpawnItem(_spawnCenter.position, _spawnCenter.rotation, InitalizePhase2Projectile);
                 ++_spawnCount;
 
+                Plane currPlane = new Plane(_defaultLookAreaNormalVector, _defaultSpawnPosition);
+                _dataHandler.MeasureUserResponse_AppP2(_defaultSpawnPosition, _spawnCenter.position, _defaultLookAreaUpVector, currPlane);
                 _centeringReticleDespawned = false;
 
                 yield return new WaitUntil(() => _phase2ProjectileDespawned);

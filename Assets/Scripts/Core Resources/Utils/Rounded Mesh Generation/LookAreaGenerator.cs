@@ -104,10 +104,14 @@ namespace CoreResources.Utils
             InitSingleton();
         }
 
-        public void RecalibrateInteractables()
+        public void RecalibrateInteractables(out Vector3 normal, out Vector3 up)
         {
             foreach (var interactable in _interactables)
                 interactable.CalibrateInteractable();
+
+            var topIter = _interactables.FirstOrDefault((x) => x.ViewingDirection == ViewAngleDirection.Top).transform;
+            normal = -1 * topIter.forward;
+            up = topIter.up;
         }
 
         public void ResetInteractables()
