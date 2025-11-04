@@ -1444,6 +1444,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _bufferSize_HMDPosRot: 60
   _bufferSize_AppP2Response: 60
+  _bufferSize_AppP3Response: 60
 --- !u!1 &162190807
 GameObject:
   m_ObjectHideFlags: 0
@@ -5288,7 +5289,7 @@ MonoBehaviour:
   - {fileID: 1973857864}
   - {fileID: 1334289836}
   _interactionPanel_AppP3: {fileID: 2116753972}
-  _phase4TargetSpawnCount: 4
+  _phase4TargetSpawnCount: 8
 --- !u!1 &944416014
 GameObject:
   m_ObjectHideFlags: 0

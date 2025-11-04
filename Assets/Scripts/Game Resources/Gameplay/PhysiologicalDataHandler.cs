@@ -25,9 +25,9 @@ namespace GameResources.Gameplay
         private string _rootFolderPath;
 
         [Header("Data Collection Settings")]
-        [SerializeField] private int _bufferSize_HMDPosRot = 60;
-        [SerializeField] private int _bufferSize_AppP2Response = 60;
-        [SerializeField] private int _bufferSize_AppP3Response = 60;
+        [SerializeField] private int _bufferSizeHMDPosRot = 60;
+        [SerializeField] private int _bufferSizeAppP2Response = 60;
+        [SerializeField] private int _bufferSizeAppP3Response = 60;
         
         #region App Phase 2
         private string _responsePathCsv;
@@ -59,7 +59,6 @@ namespace GameResources.Gameplay
         #region App Phase 4
         private string _distanceCsvPathP4 = "";
         private const string DISTANCE_HEADER_P4 = "Timestamp,DistanceX,DistanceY,DistanceZ,Displacement\n";
-
         #endregion
 
         #region App Wide Measurements
@@ -190,7 +189,7 @@ namespace GameResources.Gameplay
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
 
-            string filename = $"ViewLimits_{_fileTime}.csv";
+            string filename = $"P1_ViewLimits_{_fileTime}.csv";
             string viewLimitsPath = Path.Combine(folder, filename);
 
             File.WriteAllText(viewLimitsPath, sb.ToString());
@@ -213,9 +212,9 @@ namespace GameResources.Gameplay
                 // Build file paths for this response:
                 string idx = _responseIndexP2.ToString();
                 _responsePathCsv = Path.Combine(_rootFolderPath,
-                    $"ResponsePath_{idx}_{_fileTime}.csv");
+                    $"P2_ResponsePath_{idx}_{_fileTime}.csv");
                 _responseDataCsv = Path.Combine(_rootFolderPath,
-                    $"ResponseData_{idx}_{_fileTime}.csv");
+                    $"P2_ResponseData_{idx}_{_fileTime}.csv");
 
                 File.WriteAllText(_responsePathCsv, RESPONSE_PATH_HEADER);
                 File.WriteAllText(_responseDataCsv, RESPONSE_DATA_HEADER);
@@ -257,7 +256,7 @@ namespace GameResources.Gameplay
         {
             if (string.IsNullOrEmpty(_distanceCsvPathP4))
             {
-                string filename = $"ProprioceptionDistance_{_fileTime}.csv";
+                string filename = $"P4_ProprioceptionDistance_{_fileTime}.csv";
                 _distanceCsvPathP4 = Path.Combine(_rootFolderPath, filename);
 
                 // Write header if file does not exist
@@ -286,7 +285,7 @@ namespace GameResources.Gameplay
             string entry = $"{timestamp},{pos.x:F4},{pos.y:F4},{pos.z:F4},{rot.x:F4},{rot.y:F4},{rot.z:F4},{rot.w:F4}";
             _dataBuffer.Add(entry);
 
-            if (_dataBuffer.Count >= _bufferSize_HMDPosRot)
+            if (_dataBuffer.Count >= _bufferSizeHMDPosRot)
             {
                 // Copy and clear buffer
                 List<string> toWrite = new List<string>(_dataBuffer);
@@ -317,7 +316,7 @@ namespace GameResources.Gameplay
                     DateTime ts = DateTime.UtcNow;
                     _responseBuffer.Add((p2, ts));
 
-                    if (_responseBuffer.Count >= _bufferSize_AppP2Response)
+                    if (_responseBuffer.Count >= _bufferSizeAppP2Response)
                     {
                         FlushP2ResponseBuffer();
                     }
@@ -336,7 +335,7 @@ namespace GameResources.Gameplay
 
                     _distanceBufferP3.Add((distance, ts));
 
-                    if (_distanceBufferP3.Count >= _bufferSize_AppP3Response)
+                    if (_distanceBufferP3.Count >= _bufferSizeAppP3Response)
                     {
                         FlushP3DistanceBuffer();
                     }
@@ -474,7 +473,7 @@ namespace GameResources.Gameplay
                 case 1:
                     if (!_userMeasurementStarted)
                     {
-                        string filename = $"HeadPosRot_{_fileTime}.csv";
+                        string filename = $"General_HeadPosRot_{_fileTime}.csv";
                         _hmdPosRotCsvPath = Path.Combine(_rootFolderPath, filename);
                         File.WriteAllText(_hmdPosRotCsvPath, HMDPOSROT_HEADER); // Header
 
