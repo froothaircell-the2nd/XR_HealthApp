@@ -24,6 +24,12 @@ namespace GameResources.Gameplay
         Phase4 = 5,
     }
 
+    public enum Phase4Mode
+    {
+        FourTargetMode = 0,
+        EightTargetMode = 1
+    }
+
     public class GameplayHandler : DestroyableMonoSingleton<GameplayHandler>
     {
         #region Serialized Fields
@@ -79,8 +85,10 @@ namespace GameResources.Gameplay
         [Space(5)]
 
         [Header("Game Set - Application Phase 4")]
-        [SerializeField, Range(0, 8)]
-        private int _phase4TargetSpawnCount = 2; 
+        /*[SerializeField, Range(0, 8)]
+        private int _phase4TargetSpawnCount = 2; */
+        [SerializeField]
+        private Phase4Mode _phase4Mode;
         #endregion
 
         #region Private Fields
@@ -502,7 +510,10 @@ namespace GameResources.Gameplay
 
         private IEnumerator SpawnCoroutine_AppP4()
         {
-            for (int i = 0; i < _phase4TargetSpawnCount; i++)
+            int phase4SpawnCount = 8;
+            int phase4Offset = _phase4Mode == 0 ? 2 : 1; 
+
+            for (int i = 0; i < phase4SpawnCount; i += phase4Offset)
             {
                 _spawnCenter.localPosition = Vector3.zero;
                 _spawnCenter.localRotation = Quaternion.identity;

@@ -2,7 +2,6 @@ using CoreResources.Managers;
 using CoreResources.Singleton;
 using Cysharp.Threading.Tasks;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -22,7 +21,6 @@ namespace GameResources.Gameplay
 
         public int MaxScore => MAX_SCORE;
 
-        private string _rootFolderPath;
 
         [Header("Data Collection Settings")]
         [SerializeField] private int _bufferSizeHMDPosRot = 60;
@@ -30,8 +28,8 @@ namespace GameResources.Gameplay
         [SerializeField] private int _bufferSizeAppP3Response = 60;
         
         #region App Phase 2
-        private string _responsePathCsv;
-        private string _responseDataCsv;
+        private string _responsePathP2;
+        private string _responseDataP2;
         private bool _userResponseMeasurementStartedP2 = false;
         private Plane _cachedTargetPlaneP2;
         private Vector3 _cachedCenter, _cachedTarget, _cachedTargetPlaneUp;
@@ -63,8 +61,10 @@ namespace GameResources.Gameplay
 
         #region App Wide Measurements
         private List<string> _dataBuffer = new List<string>();
+        private string _rootFolderPath;
         private string _hmdPosRotCsvPath;
         private string _fileTime;
+        private string _currFolderPath; // Change path for each user
         private const string HMDPOSROT_HEADER = "Timestamp,PosX,PosY,PosZ,RotX,RotY,RotZ,RotW\n";
         private const string BUFFER_DATA_KEY_HMDPOSROT = "bufferDataHMD";
         #endregion
@@ -130,6 +130,7 @@ namespace GameResources.Gameplay
             _responseIndexP2 = 0;
             _distanceSampleIndexP3 = 0;
             _dataBuffer.Clear();
+            _currFolderPath = string.Empty;
 
             if (GameplayHandler.Instance.Phase >= (AppPhase) 1)
                 OnScoreUpdated?.Invoke(_score);
@@ -137,6 +138,11 @@ namespace GameResources.Gameplay
 
         public void RecordViewingAngleBounds_Sorted(Vector3 center, List<Vector3> viewLimits)
         {
+            if (_currFolderPath == String.Empty)
+            {
+                throw new Exception("Folder Path is not set!");
+            }
+
             if (_camHMD == null)
             {
                 Debug.LogError("CamHMD is not set.");
@@ -184,19 +190,19 @@ namespace GameResources.Gameplay
                 sb.Append($",{angle:F2}");
             sb.AppendLine();
 
-            // Write to file
-            string folder = Path.Combine(Application.persistentDataPath, "PhysioLogs");
-            if (!Directory.Exists(folder))
-                Directory.CreateDirectory(folder);
-
-            string filename = $"P1_ViewLimits_{_fileTime}.csv";
-            string viewLimitsPath = Path.Combine(folder, filename);
+            string filename = $"P1_ViewLimits.csv";
+            string viewLimitsPath = Path.Combine(_currFolderPath, filename);
 
             File.WriteAllText(viewLimitsPath, sb.ToString());
         }
 
         public void MeasureUserResponse_AppP2(Vector3 center, Vector3 target, Vector3 up, Plane targetPlane)
         {
+            if (_currFolderPath == String.Empty)
+            {
+                throw new Exception("Folder Path is not set!");
+            }
+
             if (!_userResponseMeasurementStartedP2)
             {
                 _userResponseMeasurementStartedP2 = true;
@@ -211,18 +217,23 @@ namespace GameResources.Gameplay
 
                 // Build file paths for this response:
                 string idx = _responseIndexP2.ToString();
-                _responsePathCsv = Path.Combine(_rootFolderPath,
-                    $"P2_ResponsePath_{idx}_{_fileTime}.csv");
-                _responseDataCsv = Path.Combine(_rootFolderPath,
-                    $"P2_ResponseData_{idx}_{_fileTime}.csv");
+                _responsePathP2 = Path.Combine(_currFolderPath,
+                    $"P2_ResponsePath_{idx}.csv");
+                _responseDataP2 = Path.Combine(_currFolderPath,
+                    $"P2_ResponseData_{idx}.csv");
 
-                File.WriteAllText(_responsePathCsv, RESPONSE_PATH_HEADER);
-                File.WriteAllText(_responseDataCsv, RESPONSE_DATA_HEADER);
+                File.WriteAllText(_responsePathP2, RESPONSE_PATH_HEADER);
+                File.WriteAllText(_responseDataP2, RESPONSE_DATA_HEADER);
             }
         }
         
         public void BeginUserPathTracking_AppP3(Transform reference, Vector3 referenceForward)
         {
+            if (_currFolderPath == String.Empty)
+            {
+                throw new Exception("Folder Path is not set!");
+            }
+
             if (!_userResponseMeasurementStartedP3)
             {
                 _targetReferenceP3 = reference;
@@ -231,8 +242,8 @@ namespace GameResources.Gameplay
 
                 _distanceBufferP3 = new List<(float, DateTime)>();
 
-                string filename = $"P3_Distance_{_distanceSampleIndexP3}_{_fileTime}.csv";
-                _distanceCsvPathP3 = Path.Combine(_rootFolderPath, filename);
+                string filename = $"P3_Distance_{_distanceSampleIndexP3}.csv";
+                _distanceCsvPathP3 = Path.Combine(_currFolderPath, filename);
 
                 File.WriteAllText(_distanceCsvPathP3, DISTANCE_HEADER_P3); // Header
             }
@@ -254,10 +265,15 @@ namespace GameResources.Gameplay
 
         public void RecordDistanceFromCenter_AppP4(Vector3 distance, float displacement)
         {
+            if (_currFolderPath == String.Empty)
+            {
+                throw new Exception("Folder Path is not set!");
+            }
+
             if (string.IsNullOrEmpty(_distanceCsvPathP4))
             {
-                string filename = $"P4_ProprioceptionDistance_{_fileTime}.csv";
-                _distanceCsvPathP4 = Path.Combine(_rootFolderPath, filename);
+                string filename = $"P4_ProprioceptionDistance.csv";
+                _distanceCsvPathP4 = Path.Combine(_currFolderPath, filename);
 
                 // Write header if file does not exist
                 if (!File.Exists(_distanceCsvPathP4))
@@ -384,7 +400,7 @@ namespace GameResources.Gameplay
                 foreach (var (pt, ts) in list)
                     sb.AppendLine($"{ts:o},{pt.x:F4},{pt.y:F4}");
 
-                using (var writer = new StreamWriter(_responsePathCsv, append: true))
+                using (var writer = new StreamWriter(_responsePathP2, append: true))
                 {
                     await writer.WriteAsync(sb.ToString());
                 }
@@ -450,7 +466,7 @@ namespace GameResources.Gameplay
             var sb = new StringBuilder();
             sb.AppendLine($"{_responseIndexP2},{startTime},{duration:F4},{center2D.x:F4},{center2D.y:F4},{target2D.x:F4},{target2D.y:F4}");
 
-            File.AppendAllText(_responseDataCsv, sb.ToString());
+            File.AppendAllText(_responseDataP2, sb.ToString());
 
             _userResponseMeasurementStartedP2 = false;
             _responseIndexP2++;
@@ -467,14 +483,22 @@ namespace GameResources.Gameplay
                     if (_userMeasurementStarted)
                     {
                         _userMeasurementStarted = false;
-
+                        _currFolderPath = string.Empty;
                     }
                     break;
                 case 1:
                     if (!_userMeasurementStarted)
                     {
-                        string filename = $"General_HeadPosRot_{_fileTime}.csv";
-                        _hmdPosRotCsvPath = Path.Combine(_rootFolderPath, filename);
+                        _fileTime = $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}"; // Get the file time again everytime the application starts over
+
+                        string fileName = $"General_HeadPosRot.csv";
+                        string folderName = $"Participant_{_fileTime}";
+                        _currFolderPath = Path.Combine(_rootFolderPath, folderName);
+
+                        if (!Directory.Exists(_currFolderPath))
+                            Directory.CreateDirectory(_currFolderPath);
+
+                        _hmdPosRotCsvPath = Path.Combine(_currFolderPath, fileName);
                         File.WriteAllText(_hmdPosRotCsvPath, HMDPOSROT_HEADER); // Header
 
                         _userMeasurementStarted = true;
@@ -489,6 +513,8 @@ namespace GameResources.Gameplay
                 case 5:
                     break;
                 default:
+                    _userMeasurementStarted = false;
+                    _currFolderPath = string.Empty;
                     break;
             }
         }
