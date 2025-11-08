@@ -44,11 +44,11 @@ namespace GameResources.Gameplay
         #endregion
 
         #region App Phase 3
+        private string _distanceCsvPathP3;
         private bool _userResponseMeasurementStartedP3 = false;
         private Transform _targetReferenceP3 = null;
         private Plane _cachedTargetPlaneP3;
         private List<(float distance, DateTime timestamp)> _distanceBufferP3;
-        private string _distanceCsvPathP3;
         private const string DISTANCE_HEADER_P3 = "Timestamp,Distance\n";
         private const string BUFFER_DATA_KEY_P3DISTANCE = "p3distanceBuffer";
         private int _distanceSampleIndexP3 = 0;
