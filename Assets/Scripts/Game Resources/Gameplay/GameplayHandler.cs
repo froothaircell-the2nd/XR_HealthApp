@@ -11,6 +11,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Wave.Native;
 
 namespace GameResources.Gameplay
 {
@@ -96,6 +97,7 @@ namespace GameResources.Gameplay
         private Quaternion _defaultSpawnRotation;
         private Vector3 _defaultLookAreaNormalVector;
         private Vector3 _defaultLookAreaUpVector;
+        private Color? recOriginalColor = null;
         private Coroutine _spawnCoroutine;
         private int _spawnCount, _warmupSelectedCount;
         private bool _triggerPressed = false,
@@ -138,6 +140,8 @@ namespace GameResources.Gameplay
         #region Overrides
         public override void OnInit()
         {
+            ShowPassthroughUnderlay(true);
+
             _defaultSpawnPosition = _spawnCenter.position;
             _defaultSpawnRotation = _spawnCenter.rotation;
 
@@ -564,6 +568,35 @@ namespace GameResources.Gameplay
             InputManager.InputActions.XRIRightHandInteraction.Select.performed += RightGripPressed;
 
             _inputsAssigned = true;
+        }
+
+        private void ShowPassthroughUnderlay(bool status)
+        {
+            var _hmdCam = _camHMD.GetComponent<Camera>();
+
+            if (status)
+            {
+                _hmdCam.clearFlags = CameraClearFlags.SolidColor;
+
+                if (recOriginalColor == null)
+                    recOriginalColor = _hmdCam.backgroundColor;
+
+                _hmdCam.backgroundColor = Color.white * 0;
+                Interop.WVR_SetPassthroughOverlayAlpha(0);
+            }
+            else
+            {
+                Interop.WVR_SetPassthroughOverlayAlpha(1);
+                _hmdCam.clearFlags = CameraClearFlags.Skybox;
+
+                if (recOriginalColor.HasValue)
+                    _hmdCam.backgroundColor = recOriginalColor.Value;
+                else
+                    _hmdCam.backgroundColor = new Color(49f / 255f, 77f / 255f, 121f / 255f, 5f / 255f);
+            }
+
+            // Interop.WVR_ShowPassthroughOverlay(!status);
+            Interop.WVR_ShowPassthroughUnderlay(status);
         }
 
         private void InitializeWarmupTarget(PooledItem item)
