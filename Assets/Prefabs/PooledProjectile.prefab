@@ -160,6 +160,7 @@ MonoBehaviour:
   _centeringReticleColor: {r: 2.9960785, g: 0.12738614, b: 0, a: 1}
   _phase2ProjectileColor: {r: 0, g: 0.60258794, b: 1.886792, a: 1}
   _phase3ProjectileColor: {r: 0.069386266, g: 2.9960785, b: 0, a: 1}
+  _phase4TargetColor: {r: 0, g: 0, b: 0, a: 0}
   _warmupTargetColor1: {r: 2.9960785, g: 0.09892665, b: 0.09892665, a: 1}
   _warmupTargetColor2: {r: 0.09892664, g: 0.5785011, b: 2.9960785, a: 1}
   _trailRenderer: {fileID: -2675595989743708932}

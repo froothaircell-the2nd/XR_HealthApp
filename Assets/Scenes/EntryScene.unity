@@ -1162,8 +1162,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
-  minDistance: 0.5
-  maxDistance: 18
+  minDistance: 0
+  maxDistance: 100
   _viewAngleDirection: 4
 --- !u!54 &153689096
 Rigidbody:
@@ -2298,8 +2298,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
-  minDistance: 0.5
-  maxDistance: 18
+  minDistance: 0
+  maxDistance: 100
   _viewAngleDirection: 6
 --- !u!23 &293028970
 MeshRenderer:
@@ -2838,8 +2838,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
-  minDistance: 0.5
-  maxDistance: 18
+  minDistance: 0
+  maxDistance: 100
   _viewAngleDirection: 3
 --- !u!54 &495841029
 Rigidbody:
@@ -3839,8 +3839,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
-  minDistance: 0.5
-  maxDistance: 18
+  minDistance: 0
+  maxDistance: 100
   _viewAngleDirection: 7
 --- !u!54 &707248867
 Rigidbody:
@@ -4460,14 +4460,14 @@ MonoBehaviour:
   _scenePerceptionManager: {fileID: 847311940}
   _spatialAnchorHelper:
     anchorMode: 0
-  target2DPlane: 0
+  target2DPlane: 1
   target3DObject: 0
-  targetSceneMesh: 1
+  targetSceneMesh: 0
   _generatedMeshMaterialTranslucent: {fileID: 2100000, guid: b0e2136222c18364894daabc3a3dd31d, type: 2}
   _generatedMeshMaterialWireframe: {fileID: 2100000, guid: 4c07f320866ca5448a4f57d518c84842, type: 2}
   _generatedMeshMaterialTexture: {fileID: 2100000, guid: 471734ef7e9c3324bab50536afc7e076, type: 2}
   _anchorPrefab: {fileID: 6137973343519671895, guid: 8d6ec01245a5f6040aded91973fd6d30, type: 3}
-  _anchorDisplayPrefab: {fileID: 6137973343519671895, guid: 0c87a5379eca0c642a8a804630e46fca, type: 3}
+  _anchorDisplayPrefab: {fileID: 6137973343519671895, guid: bf43257d9ad3833418acf7ecf52b71f9, type: 3}
 --- !u!1 &859134311
 GameObject:
   m_ObjectHideFlags: 0
@@ -4669,8 +4669,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
-  minDistance: 0.5
-  maxDistance: 18
+  minDistance: 0
+  maxDistance: 100
   _viewAngleDirection: 1
 --- !u!54 &873484179
 Rigidbody:
@@ -4964,8 +4964,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
-  minDistance: 0.5
-  maxDistance: 18
+  minDistance: 0
+  maxDistance: 100
   _viewAngleDirection: 2
 --- !u!23 &921883819
 MeshRenderer:
@@ -5326,6 +5326,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _appCalibrationDistance: 15
+  _appCalibrationDistanceFactor: 0.8
+  _appCalibrationDistanceFactor_UI: 0.9
+  _appCalibrationDistanceFactor_BlackScreen: 0.6
+  _appCalibrationScaling: 0.45
   _pool: {fileID: 1426362292}
   _dataHandler: {fileID: 159113223}
   _gameSetWarmup: {fileID: 2130264085}
@@ -5347,7 +5351,6 @@ MonoBehaviour:
   _spawnCenter: {fileID: 442297610}
   _minSpawnDelay: 2
   _maxSpawnDelay: 8
-  _maxSpawnDistance: 10
   _collisionLayerMask:
     serializedVersion: 2
     m_Bits: 128
@@ -6650,8 +6653,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
-  minDistance: 0.5
-  maxDistance: 18
+  minDistance: 0
+  maxDistance: 100
   _viewAngleDirection: 5
 --- !u!54 &1204335886
 Rigidbody:
@@ -7197,18 +7200,6 @@ PrefabInstance:
       value: Wave Rig
       objectReference: {fileID: 0}
     - target: {fileID: 1007395437889857441, guid: 73d680c6fe00f2c4b9cc8785619ff823, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1007395437889857441, guid: 73d680c6fe00f2c4b9cc8785619ff823, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1007395437889857441, guid: 73d680c6fe00f2c4b9cc8785619ff823, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1007395437889857441, guid: 73d680c6fe00f2c4b9cc8785619ff823, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -7247,10 +7238,6 @@ PrefabInstance:
     - target: {fileID: 1007395437889857441, guid: 73d680c6fe00f2c4b9cc8785619ff823, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1007395437889857441, guid: 73d680c6fe00f2c4b9cc8785619ff823, type: 3}
-      propertyPath: m_ConstrainProportionsScale
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9101,8 +9088,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
-  minDistance: 0.5
-  maxDistance: 18
+  minDistance: 0
+  maxDistance: 100
   _viewAngleDirection: 0
 --- !u!23 &1972941862
 MeshRenderer:

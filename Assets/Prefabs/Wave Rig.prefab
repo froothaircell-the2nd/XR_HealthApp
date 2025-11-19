@@ -35,8 +35,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 2581056498341089187}
   - {fileID: 857869164279338414}
@@ -178,7 +178,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 685352838213943130}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2213c36610e3b1c4bbf886810ed9db12, type: 3}
   m_Name: 
@@ -1619,7 +1619,7 @@ MonoBehaviour:
   m_PhysicsCastDistance: 100
   m_PhysicsEventMask:
     serializedVersion: 2
-    m_Bits: 247
+    m_Bits: 246
   s_GraphicTags: []
   m_ShowRay: 1
   m_RayStartWidth: 0.01
@@ -4143,7 +4143,7 @@ MonoBehaviour:
   m_PhysicsCastDistance: 100
   m_PhysicsEventMask:
     serializedVersion: 2
-    m_Bits: 247
+    m_Bits: 246
   s_GraphicTags: []
   m_ShowRay: 1
   m_RayStartWidth: 0.01
@@ -4655,7 +4655,7 @@ MonoBehaviour:
     m_Bits: 2688
   _paddingMultiplier: 4.5
   _maxRaycastRange: 200
-  _spherecastRadius: 0.5
+  _spherecastRadius: 0.1
   _raycastRefreshPeriod: 0.01
   _defaultSprite: {fileID: 21300000, guid: f2eb7ace632f139409c46e022feb2240, type: 3}
   _interactableSprite: {fileID: 21300000, guid: d828fbef127800341a4478650aa590cd, type: 3}
