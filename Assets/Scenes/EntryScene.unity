@@ -1442,9 +1442,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85e0369f00c559e4bb7de49f42d8bf6e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _bufferSize_HMDPosRot: 60
-  _bufferSize_AppP2Response: 60
-  _bufferSize_AppP3Response: 60
+  _bufferSizeHMDPosRot: 60
+  _bufferSizeAppP2Response: 60
+  _bufferSizeAppP3Response: 60
 --- !u!1 &162190807
 GameObject:
   m_ObjectHideFlags: 0
@@ -5289,7 +5289,7 @@ MonoBehaviour:
   - {fileID: 1973857864}
   - {fileID: 1334289836}
   _interactionPanel_AppP3: {fileID: 2116753972}
-  _phase4TargetSpawnCount: 8
+  _phase4Mode: 0
 --- !u!1 &944416014
 GameObject:
   m_ObjectHideFlags: 0

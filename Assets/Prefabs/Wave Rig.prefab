@@ -4716,7 +4716,7 @@ MonoBehaviour:
     m_Bits: 2688
   _paddingMultiplier: 4.5
   _maxRaycastRange: 200
-  _spherecastRadius: 0.5
+  _spherecastRadius: 0.1
   _raycastRefreshPeriod: 0.01
   _defaultSprite: {fileID: 21300000, guid: f2eb7ace632f139409c46e022feb2240, type: 3}
   _interactableSprite: {fileID: 21300000, guid: d828fbef127800341a4478650aa590cd, type: 3}
