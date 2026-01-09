@@ -1163,7 +1163,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
   minDistance: 0.5
-  maxDistance: 18
+  maxDistance: 100
   _viewAngleDirection: 4
 --- !u!54 &153689096
 Rigidbody:
@@ -2299,7 +2299,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
   minDistance: 0.5
-  maxDistance: 18
+  maxDistance: 100
   _viewAngleDirection: 6
 --- !u!23 &293028970
 MeshRenderer:
@@ -2837,7 +2837,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
   minDistance: 0.5
-  maxDistance: 18
+  maxDistance: 100
   _viewAngleDirection: 3
 --- !u!54 &495841029
 Rigidbody:
@@ -3838,7 +3838,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
   minDistance: 0.5
-  maxDistance: 18
+  maxDistance: 100
   _viewAngleDirection: 7
 --- !u!54 &707248867
 Rigidbody:
@@ -4599,7 +4599,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
   minDistance: 0.5
-  maxDistance: 18
+  maxDistance: 100
   _viewAngleDirection: 1
 --- !u!54 &873484179
 Rigidbody:
@@ -4894,7 +4894,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
   minDistance: 0.5
-  maxDistance: 18
+  maxDistance: 100
   _viewAngleDirection: 2
 --- !u!23 &921883819
 MeshRenderer:
@@ -6580,7 +6580,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
   minDistance: 0.5
-  maxDistance: 18
+  maxDistance: 100
   _viewAngleDirection: 5
 --- !u!54 &1204335886
 Rigidbody:
@@ -9010,7 +9010,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _highlightColor: {r: 20.830181, g: 0.110529624, b: 0, a: 1}
   minDistance: 0.5
-  maxDistance: 18
+  maxDistance: 100
   _viewAngleDirection: 0
 --- !u!23 &1972941862
 MeshRenderer:
